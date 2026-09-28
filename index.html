@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap">
+<style>
+  :root {
+    --rouge: #C1362F;          /* couleur de Vosges Rénovation */
+    --rouge-fonce: #9E2A24;
+    --rouge-pale: #FBEDEC;
+    --texte: #241E1D;
+    --gris: #6B6362;
+    --gris-clair: #9C9493;
+    --bord: #E4DDDB;
+    --fond: #F6F3F2;
+    --carte: #FFFFFF;
+    --vert: #1E7F4F;           /* ce qui va bien */
+    --vert-pale: #E2F3E9;
+    --rose: #B8195A;           /* écart négatif */
+    --rose-pale: #FCE4EE;
+    --fond-prevu: #F1EDEB;     /* colonne Prévu */
+    --fond-reel: #E6F0FA;      /* colonne Réel, et « heures saisies » dans Planning */
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--fond); color: var(--texte); }
+  body {
+    font-family: 'Satoshi', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: 16px; line-height: 1.4;
+    -webkit-text-size-adjust: 100%;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  button, input, select { font: inherit; color: inherit; }
+  button, select { cursor: pointer; }
+  button:disabled { cursor: default; opacity: .5; }
+  input, select { font-size: 16px; } /* en dessous de 16px, l'iPhone zoome tout seul */
+
+  header.bandeau {
+    background: var(--rouge); color: #fff;
+    padding: calc(12px + env(safe-area-inset-top)) 16px 12px;
+    display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  }
+  header.bandeau .soc { font-weight: 700; font-size: 18px; }
+  header.bandeau .quoi { opacity: .85; font-size: 15px; }
+  header.bandeau .qui { margin-left: auto; font-size: 15px; opacity: .9; }
+
+  main { max-width: 1480px; margin: 0 auto; padding: 16px; }
+  .etroit { max-width: 560px; }
+
+  .btn {
+    border: 0; border-radius: 10px; padding: 12px 18px; min-height: 48px;
+    background: var(--rouge); color: #fff; font-weight: 700;
+  }
+  .btn:active { background: var(--rouge-fonce); }
+  .btn.second { background: #fff; color: var(--texte); border: 1.5px solid var(--bord); font-weight: 500; }
+  .btn.plein { width: 100%; }
+  .btn.petit { min-height: 38px; padding: 7px 12px; font-size: 14px; }
+  .lien-btn { background: none; border: 0; padding: 8px 0; color: var(--rouge); font-weight: 500; text-decoration: underline; }
+
+  .message { padding: 12px 14px; border-radius: 10px; margin-bottom: 14px; }
+  .message.erreur { background: var(--rose-pale); color: var(--rose); font-weight: 500; }
+  .message.info { background: #fff; border: 1px solid var(--bord); }
+  .chargement { color: var(--gris); padding: 30px 0; text-align: center; }
+
+  #toast {
+    position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom)); transform: translateX(-50%);
+    background: var(--texte); color: #fff; padding: 12px 18px; border-radius: 10px;
+    max-width: calc(100% - 32px); display: none; z-index: 50;
+  }
+
+  /* ---------- Salarié ---------- */
+  .semaine-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 4px 0 14px; }
+  .semaine-nav .titre { font-weight: 700; text-align: center; flex: 1; }
+  .semaine-nav .btn { min-width: 48px; padding: 10px 14px; }
+
+  .jour { background: var(--carte); border: 1px solid var(--bord); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+  .jour.aujourdhui { border: 2px solid var(--rouge); }
+  .jour-tete { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .jour-nom { font-weight: 700; font-size: 17px; }
+  .etiquette { font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+  .etiquette.auj { background: var(--rouge); color: #fff; }
+  .etiquette.ok { background: var(--vert-pale); color: var(--vert); }
+  .etiquette.manque { background: var(--rose-pale); color: var(--rose); }
+  .etiquette.attente { background: var(--fond); color: var(--gris); }
+  .bloc { margin: 6px 0; }
+  .bloc-titre { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--gris); font-weight: 700; }
+  .creneau { margin: 3px 0; }
+  .creneau .ch { font-weight: 700; }
+  .creneau .adr { color: var(--gris); font-size: 14px; }
+  .creneau .h { font-variant-numeric: tabular-nums; }
+  .vide { color: var(--gris-clair); }
+  .apercu { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 3px; margin: -4px 0 12px; }
+  .apercu th { font-size: 13px; font-weight: 700; color: var(--gris); text-align: center; padding: 0; }
+  .apercu th span { display: block; font-size: 11px; font-weight: 500; }
+  .apercu th.auj { color: var(--rouge); }
+  .apercu th.moment { width: 38px; font-size: 10px; text-align: left; }
+  .apercu td { padding: 0; vertical-align: top; }
+  .ap-case { width: 100%; min-height: 48px; padding: 4px 2px; border: 1px solid var(--bord); border-radius: 6px; background: #fff;
+    font-size: 10px; font-weight: 700; line-height: 1.2; text-align: center; overflow-wrap: normal; hyphens: auto; -webkit-hyphens: auto; }
+  .ap-case.auj { border: 1.5px solid var(--rouge); }
+  .ap-case.heures { min-height: 36px; font-weight: 500; font-size: 11px; font-variant-numeric: tabular-nums; }
+  .moitie { padding: 2px 0 6px; }
+  .moitie.suite { border-top: 1px dashed var(--bord); padding-top: 8px; }
+  .cote-a-cote { display: grid; grid-template-columns: 1fr 1fr; column-gap: 12px; margin: 6px 0; }
+  .cote-a-cote > * { min-width: 0; overflow-wrap: anywhere; }
+  .cote-a-cote .reel { border-left: 1px solid var(--bord); padding-left: 12px; }
+  .cote-a-cote .demi { padding-top: 4px; padding-bottom: 6px; }
+  .cote-a-cote .suite { border-top: 1px dashed var(--bord); padding-top: 8px; }
+  .actions-jour { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .verrou { color: var(--gris); font-size: 14px; margin-top: 8px; }
+
+  /* ---------- Fenêtre de saisie ---------- */
+  .voile { position: fixed; inset: 0; background: rgba(36,30,29,.45); z-index: 40; display: flex; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 24px 12px; }
+  .fenetre { background: #fff; border-radius: 16px; width: 100%; max-width: 520px; padding: 18px; }
+  .fenetre h2 { margin: 0 0 2px; font-size: 19px; }
+  .fenetre .sous { color: var(--gris); margin-bottom: 14px; }
+  .ligne-saisie { border: 1px solid var(--bord); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+  .champ { display: block; margin-bottom: 10px; }
+  .champ > span { display: block; font-size: 13px; font-weight: 700; color: var(--gris); margin-bottom: 4px; }
+  .champ select, .champ input { width: 100%; min-height: 46px; padding: 8px 10px; border: 1.5px solid var(--bord); border-radius: 8px; background: #fff; }
+  .aide-heure { font-size: 12px; color: var(--gris); margin-top: 6px; }
+  .trio { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .trio .champ { margin-bottom: 0; }
+  .duree { margin-top: 8px; font-size: 14px; color: var(--gris); }
+  .case-a-cocher { display: flex; align-items: center; gap: 10px; padding: 12px 0; cursor: pointer; }
+  .case-a-cocher input { width: 22px; height: 22px; cursor: pointer; accent-color: var(--rouge); margin: 0; }
+  .jours-supp { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+  .jours-supp .case-a-cocher { padding: 6px 0; }
+  .pied { display: flex; gap: 10px; margin-top: 14px; }
+  .pied .btn { flex: 1; }
+  .fenetre .erreur-saisie { color: var(--rose); font-weight: 500; margin-top: 10px; }
+
+  /* ---------- Responsables ---------- */
+  .onglets { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .onglet { border: 1.5px solid var(--bord); background: #fff; border-radius: 10px; padding: 10px 16px; font-weight: 500; min-height: 44px; }
+  .onglet.actif { background: var(--rouge); border-color: var(--rouge); color: #fff; font-weight: 700; }
+  .barre { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .barre .titre { font-weight: 700; font-size: 17px; min-width: 260px; text-align: center; }
+  .barre .espace { flex: 1; }
+
+  .grille-cadre { overflow-x: auto; }
+  table.grille { border-collapse: separate; border-spacing: 5px; width: 100%; min-width: 1040px; table-layout: fixed; }
+  table.grille th { font-size: 14px; font-weight: 700; color: var(--gris); text-align: left; padding: 2px 4px; }
+  table.grille th.auj { color: var(--rouge); }
+  table.grille th.col-nom { width: 150px; }
+  table.grille td.nom { font-size: 14px; line-height: 1.25; overflow-wrap: anywhere; }
+  .case.case-reel { background: var(--fond-reel); border-color: #BCD4EC; }
+  .case.case-reel.auj { border-color: var(--rouge); }
+  .simple { width: 100%; padding-bottom: 4px; }
+  .simple.suite { border-top: 1px dashed var(--bord); padding-top: 4px; }
+  .heures-jour { margin-top: auto; padding-top: 4px; font-size: 13px; font-weight: 700; }
+  .legende { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--gris); }
+  .legende .pastille { width: 14px; height: 14px; border-radius: 4px; background: var(--fond-reel); border: 1px solid #BCD4EC; }
+  table.grille th .sous-th { display: grid; grid-template-columns: 1fr 1fr; font-size: 11px; font-weight: 500; color: var(--gris-clair); text-transform: uppercase; letter-spacing: .04em; margin-top: 2px; }
+  table.grille th .sous-th span { background: var(--fond-prevu); border-radius: 4px; padding: 1px 5px; margin-right: 3px; }
+  table.grille th .sous-th span + span { background: var(--fond-reel); margin-right: 0; margin-left: 3px; }
+  /* Prévu / Réel : deux fonds, un par colonne ; l'écart ne colore que le contour et le texte */
+  .case.cmp .dbl { column-gap: 4px; padding-bottom: 3px; }
+  .case.cmp .dbl.suite { border-top: 0; padding-top: 0; }
+  .case.cmp { padding: 5px; }
+  .case.cmp .dbl-c { background: var(--fond-prevu); border-radius: 5px; padding: 3px 4px; }
+  .case.cmp .dbl-c.r { background: var(--fond-reel); border-left: 0; }
+  .case.cmp.bord-neg { border-color: var(--rose); }
+  .case.cmp.bord-ok { border-color: var(--vert); }
+  .bord-neg .ecart { color: var(--rose); }
+  .bord-ok .ecart { color: var(--vert); }
+  .dbl { display: grid; grid-template-columns: 1fr 1fr; column-gap: 6px; width: 100%; padding-bottom: 4px; }
+  .dbl.suite { border-top: 1px dashed var(--bord); padding-top: 4px; }
+  .dbl-c { min-width: 0; overflow-wrap: anywhere; }
+  .dbl-c.r { border-left: 1px dashed var(--bord); padding-left: 6px; }
+  .dbl .h { font-size: 12px; overflow-wrap: normal; word-break: keep-all; }
+  table.grille th.col-total { width: 118px; }
+  table.grille td.nom { font-weight: 700; vertical-align: top; padding-top: 10px; }
+  .case {
+    width: 100%; min-height: 92px; text-align: left; vertical-align: top;
+    background: #fff; border: 1.5px solid var(--bord); border-radius: 10px; padding: 8px;
+    display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch;
+  }
+  table.grille td { vertical-align: top; }
+  button.case:hover { border-color: var(--rouge); }
+  .case.vide-case { color: var(--gris-clair); align-items: center; justify-content: center; font-size: 22px; }
+  .case.auj { border-color: var(--rouge); }
+  .case.futur { background: #FBFAF9; }
+  .case.ecart-neg { background: var(--rose-pale); border-color: #F1B8CE; }
+  .case.ecart-ok { background: var(--vert-pale); border-color: #BFE3CD; }
+  .case .ch { font-weight: 700; font-size: 13px; line-height: 1.25; }
+  .case .h { font-size: 13px; font-variant-numeric: tabular-nums; }
+  .case .note { font-size: 12px; color: var(--gris); font-style: italic; }
+  .case .ligne-pr { font-size: 13px; }
+  .case .ecart { font-weight: 700; font-size: 14px; margin-top: 3px; }
+  .ecart-neg .ecart, .txt-neg { color: var(--rose); }
+  .ecart-ok .ecart, .txt-ok { color: var(--vert); }
+  .total { font-size: 14px; vertical-align: top; padding-top: 10px; font-variant-numeric: tabular-nums; }
+  .total b { font-size: 15px; }
+
+  .reglages { display: grid; grid-template-columns: 1fr; gap: 18px; }
+  .panneau { background: #fff; border: 1px solid var(--bord); border-radius: 14px; padding: 16px; }
+  .panneau h3 { margin: 0 0 10px; font-size: 17px; }
+  .panneau .aide { color: var(--gris); font-size: 14px; margin: -4px 0 12px; }
+  .rang { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 0; border-top: 1px solid var(--bord); }
+  .rang:first-of-type { border-top: 0; }
+  .rang input[type=text] { min-height: 40px; padding: 6px 10px; border: 1.5px solid var(--bord); border-radius: 8px; }
+  .rang .nom-in { width: 190px; }
+  .rang .adr-in { flex: 1; min-width: 220px; }
+  .rang .lien-in { flex: 1; min-width: 260px; font-size: 13px; color: var(--gris); background: var(--fond); }
+  .rang .case-a-cocher { padding: 6px 0; }
+  .inactif { opacity: .55; }
+  .titre-impression { display: none; }
+  #impression { display: none; }
+  .choix-semaines { display: flex; gap: 8px; margin: 6px 0 4px; }
+  .choix-semaines .btn { flex: 1; font-size: 18px; }
+  table.compteur { border-collapse: collapse; background: #fff; border: 1px solid var(--bord); border-radius: 12px; min-width: 640px; }
+  table.compteur th, table.compteur td { padding: 10px 16px; border-bottom: 1px solid var(--bord); text-align: right; font-variant-numeric: tabular-nums; }
+  table.compteur th { font-size: 13px; color: var(--gris); font-weight: 700; vertical-align: bottom; }
+  table.compteur th span { font-weight: 500; }
+  table.compteur td.nom, table.compteur th.col-nom { text-align: left; font-weight: 700; }
+  table.compteur .tot { font-weight: 700; background: var(--fond-reel); }
+  table.compteur tr:last-child td { border-bottom: 0; }
+  .aide-compteur { color: var(--gris); font-size: 13px; margin-top: 10px; }
+  @media print {
+    @page { size: A4 landscape; margin: 8mm; }
+    /* Plusieurs semaines en portrait : seule la zone d'impression sort */
+    body.impr-multi header.bandeau, body.impr-multi main { display: none !important; }
+    body.impr-multi #impression { display: block; }
+    .impr-tete { font-size: 11px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+    .impr-legende { display: inline-flex; align-items: center; gap: 4px; font-size: 9px; color: var(--gris); }
+    .impr-legende .pastille { width: 10px; height: 10px; border-radius: 3px; background: var(--fond-reel); border: 1px solid #BCD4EC; }
+    .impr-semaine { break-inside: avoid; page-break-inside: avoid; margin-bottom: 12px; }
+    .impr-titre { font-size: 11px; font-weight: 700; margin: 0 0 2px; }
+    table.impr { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 8.5px; line-height: 1.25; }
+    table.impr th { font-size: 9px; text-align: left; color: var(--gris); padding: 1px 3px; }
+    table.impr td { border: 1px solid var(--bord); padding: 2px 3px; vertical-align: top; overflow-wrap: anywhere; }
+    table.impr th.n { width: 92px; }
+    table.impr th.t { width: 56px; }
+    table.impr td.n { font-weight: 700; font-size: 9px; overflow-wrap: normal; }
+    table.impr td.t { font-size: 8.5px; }
+    table.impr td.r { background: var(--fond-reel); }
+    table.impr .ch { font-weight: 700; font-size: 8.5px; }
+    table.impr .h, table.impr .note { font-size: 8px; }
+    table.impr .simple { padding-bottom: 1px; }
+    table.impr .simple.suite { border-top: 1px dashed var(--bord); padding-top: 1px; }
+    table.impr .hj { font-weight: 700; font-size: 8px; margin-top: 1px; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    html, body { background: #fff; }
+    header.bandeau, .onglets, .barre, #toast, .voile { display: none !important; }
+    main { max-width: none; padding: 0; }
+    .titre-impression { display: block; font-size: 15px; font-weight: 700; margin: 0 0 6px; }
+    .grille-cadre { overflow: visible; }
+    table.grille { min-width: 0; border-spacing: 3px; }
+    table.grille tr { break-inside: avoid; page-break-inside: avoid; }
+    table.grille th.col-nom { width: 115px; }
+    table.grille td.nom { font-size: 11px; overflow-wrap: normal; }
+    table.grille th.auj { color: var(--gris); }
+    .ecran-seul { display: none; }
+    .case.auj { border-color: var(--bord); }
+    .case.case-reel.auj { border-color: #BCD4EC; }
+    table.grille th.col-total { width: 95px; }
+    .case { min-height: 0; padding: 4px; }
+    .case.vide-case { font-size: 0; }
+    .case .ch, .dbl .h, .case .h, .heures-jour, .total { font-size: 10px; }
+    /* Un document qui sort : pas de couleur d'alerte, les chiffres suffisent */
+    .case.cmp.bord-neg, .case.cmp.bord-ok { border-color: var(--bord); }
+    .ecart, .bord-neg .ecart, .bord-ok .ecart, .txt-neg, .txt-ok { color: var(--texte) !important; }
+    .note { display: none; }
+  }
+</style>
+</head>
+<body>
+<header class="bandeau">
+  <span class="soc">Vosges Rénovation</span>
+  <span class="quoi" id="quoi">Planning chantiers</span>
+  <span class="qui" id="qui"></span>
+</header>
+<main id="app"><div class="chargement">Chargement…</div></main>
+<div id="toast"></div>
+<div id="impression"></div>
+
+<script type="application/json" id="conf"><?!= conf ?></script>
+<script>
+(function () {
+  'use strict';
+
+  // ------------------------------------------------------------------------------------------
+  // Configuration et appel au serveur Google
+  // ------------------------------------------------------------------------------------------
+  var CONF = { code: '', role: '' }; // le rôle arrive avec le premier appel
+  try { CONF = JSON.parse(document.getElementById('conf').textContent); } catch (e) { /* page ouverte hors Google */ }
+  // Page déposée hors de Google : le code est dans l'adresse de la page (…?k=code)
+  if (!CONF.code) {
+    var m = /[?&]k=([0-9a-zA-Z]+)/.exec(location.search);
+    if (m) CONF.code = m[1];
+  }
+  if (window.__ESSAI) CONF = window.__ESSAI.conf;
+
+  // Adresse de l'appli Google (…/exec) : sert quand la page est déposée ailleurs (GitHub Pages)
+  var ADRESSE_GOOGLE = 'https://script.google.com/macros/s/AKfycby3jxyEgdf4tUBHajArPngdO1NGmltadz_FFklFFCVc82DTcabMZPZFRFc0Pw9yhLP2SQ/exec';
+
+  function api(action, donnees) {
+    return new Promise(function (ok, ko) {
+      var minuteur = setTimeout(function () { ko(new Error('Google ne répond pas (plus de 25 secondes, « ' + action + ' »).')); }, 25000);
+      var reponse = function (r) { clearTimeout(minuteur); if (r && r.ok) ok(r.res); else ko(new Error((r && r.erreur) || 'Erreur inconnue.')); };
+      var panne = function (e) { clearTimeout(minuteur); ko(new Error('Connexion impossible (' + ((e && e.message) || e) + '). Vérifiez le réseau et réessayez.')); };
+      if (window.google && google.script && google.script.run) {
+        // Page affichée par Google
+        google.script.run.withSuccessHandler(reponse).withFailureHandler(panne).appel(CONF.code, action, donnees || {});
+      } else if (ADRESSE_GOOGLE) {
+        // Page déposée ailleurs : même demande, envoyée à Google par Internet
+        fetch(ADRESSE_GOOGLE, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ code: CONF.code, action: action, donnees: donnees || {} })
+        }).then(function (x) { return x.json(); }).then(reponse, panne);
+      } else {
+        clearTimeout(minuteur);
+        ko(new Error('Page ouverte hors de Google, sans adresse de l\'appli.'));
+      }
+    });
+  }
+
+  // Une erreur de la page elle-même s'affiche au lieu de laisser l'écran figé
+  window.addEventListener('error', function (e) { toast('Erreur de la page : ' + e.message); });
+  window.addEventListener('unhandledrejection', function (e) { toast('Erreur de la page : ' + ((e.reason && e.reason.message) || e.reason)); });
+
+  // ------------------------------------------------------------------------------------------
+  // Outils : dates, heures, texte
+  // ------------------------------------------------------------------------------------------
+  var JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+  var MOIS = ['janv.', 'févr.', 'mars', 'avril', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
+  var PAUSES = [0, 15, 30, 45, 60, 75, 90, 105, 120];
+
+  function d(s) { return new Date(s + 'T00:00:00Z'); }
+  function plusJours(s, n) { var x = d(s); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); }
+  function maj(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
+  function jourLong(s) { var x = d(s); return maj(JOURS[x.getUTCDay()]) + ' ' + x.getUTCDate() + ' ' + MOIS[x.getUTCMonth()]; }
+  function jourCourt(s) { var x = d(s); return maj(JOURS[x.getUTCDay()].slice(0, 3)) + '. ' + x.getUTCDate(); }
+  function titreSemaine(lundi) {
+    var a = d(lundi), b = d(plusJours(lundi, 6));
+    return 'Semaine du ' + a.getUTCDate() + (a.getUTCMonth() !== b.getUTCMonth() ? ' ' + MOIS[a.getUTCMonth()] : '')
+      + ' au ' + b.getUTCDate() + ' ' + MOIS[b.getUTCMonth()];
+  }
+  /** « 830 », « 0830 », « 8h30 », « 8:30 », « 17 » → « 08:30 » / « 17:00 » ; '' si ce n'est pas une heure. */
+  function lireHeure(t) {
+    var x = String(t || '').trim().toLowerCase().replace(/\s/g, '');
+    var h, m, r = x.match(/^(\d{1,2})[h:.,](\d{2})?$/);
+    if (r) { h = Number(r[1]); m = Number(r[2] || 0); }
+    else if (/^\d{1,2}$/.test(x)) { h = Number(x); m = 0; }
+    else if (/^\d{3,4}$/.test(x)) { h = Number(x.slice(0, x.length - 2)); m = Number(x.slice(-2)); }
+    else return '';
+    if (h > 23 || m > 59) return '';
+    return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+  }
+  function min(h) { var p = String(h).split(':'); return Number(p[0]) * 60 + Number(p[1]); }
+  function duree(l) { return l.chantier ? Math.max(0, min(l.fin) - min(l.debut) - (Number(l.pause) || 0)) : 0; }
+  function total(lignes) { return lignes.reduce(function (s, l) { return s + duree(l); }, 0); }
+  function fh(m) { var h = Math.floor(Math.abs(m) / 60), r = Math.abs(m) % 60; return h + 'h' + (r < 10 ? '0' : '') + r; }
+  function hCourt(m) { var r = m % 60; return Math.floor(m / 60) + 'h' + (r ? (r < 10 ? '0' : '') + r : ''); }
+  function fEcart(m) { return (m < 0 ? '−' : m > 0 ? '+' : '') + fh(m); }
+  function heure(h) { return h ? h.replace(':', 'h') : ''; }
+  function esc(s) {
+    return String(s === undefined || s === null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function el(html) { var t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstChild; }
+  var app = document.getElementById('app');
+
+  var minuteurToast = null;
+  function toast(txt) {
+    var t = document.getElementById('toast');
+    t.textContent = txt; t.style.display = 'block';
+    clearTimeout(minuteurToast); minuteurToast = setTimeout(function () { t.style.display = 'none'; }, 4000);
+  }
+  function erreurPage(txt) { app.innerHTML = '<div class="message erreur">' + esc(txt) + '</div>'; }
+
+  function parJour(lignes) {
+    var m = {};
+    lignes.forEach(function (l) { var k = l.salarie + '|' + l.date; (m[k] = m[k] || []).push(l); });
+    Object.keys(m).forEach(function (k) { m[k].sort(function (a, b) { return String(a.debut).localeCompare(String(b.debut)); }); });
+    return m;
+  }
+
+  /** Texte d'une journée (prévu ou réel), identique pour le salarié et les responsables. */
+  function htmlLignes(lignes, chantiers, avecAdresse) {
+    if (!lignes || !lignes.length) return '';
+    return lignes.map(function (l) {
+      if (!l.chantier) return '<div class="creneau"><span class="ch">' + esc(l.remarque || 'Absent') + '</span></div>';
+      var c = chantiers[l.chantier];
+      var nom = c ? c.nom : (l.chantierNom || 'Chantier');
+
+      return '<div class="creneau"><div class="ch">' + esc(nom) + '</div>'
+        + (avecAdresse && c && c.adresse ? '<div class="adr">' + esc(c.adresse) + '</div>' : '')
+        + '<div class="h">' + heure(l.debut) + ' → ' + heure(l.fin) + '</div>'
+        + '<div class="h">' + (l.pause ? 'pause ' + fh(l.pause) + ' · ' : '') + '<b>' + fh(duree(l)) + '</b></div>'
+        + (l.remarque ? '<div class="adr">' + esc(l.remarque) + '</div>' : '') + '</div>';
+    }).join('');
+  }
+
+  // ------------------------------------------------------------------------------------------
+  // Données chargées d'avance et envois en arrière-plan (salarié et responsables)
+  // ------------------------------------------------------------------------------------------
+  // Chaque vue garde en mémoire environ trois mois (per.du → per.au). Changer de semaine à
+  // l'intérieur ne demande rien à Google ; près du bord, la suite se charge sans faire attendre.
+  function naviguer(per, lundi, action, dessiner) {
+    var demande = { du: plusJours(lundi, -56), au: plusJours(lundi, 62) };
+    if (lundi >= per.du && plusJours(lundi, 6) <= per.au) {
+      dessiner();
+      if (plusJours(lundi, -14) < per.du || plusJours(lundi, 20) > per.au) {
+        api(action, demande).then(function (r) { fusionner(per, r); dessiner(); }, function () { /* on réessaiera au prochain clic */ });
+      }
+      return;
+    }
+    app.innerHTML = '<div class="chargement">Chargement…</div>';
+    api(action, demande).then(function (r) { fusionner(per, r); dessiner(); })
+      .catch(function (e) { erreurPage(e.message); });
+  }
+
+  function fusionner(per, r) {
+    var disjoint = r.du > plusJours(per.au, 1) || r.au < plusJours(per.du, -1);
+    var garder = function (x) { return !disjoint && (x.date < r.du || x.date > r.au); };
+    per.prevu = per.prevu.filter(garder).concat(r.prevu);
+    per.reel = per.reel.filter(garder).concat(r.reel);
+    per.du = disjoint || r.du < per.du ? r.du : per.du;
+    per.au = disjoint || r.au > per.au ? r.au : per.au;
+    if (r.aujourdhui) per.aujourdhui = r.aujourdhui;
+    if (r.limite) per.limite = r.limite;
+    // Ce qui a été saisi pendant la session reste affiché tel que saisi
+    Object.keys(ENVOIS).forEach(function (k) {
+      var x = k.split('|');
+      appliquerLocal(per[x[0]], x[1], [x[2]], ENVOIS[k].lignes);
+    });
+  }
+
+  function appliquerLocal(liste, sal, dates, lignes) {
+    for (var i = liste.length - 1; i >= 0; i--) {
+      if (liste[i].salarie === sal && dates.indexOf(liste[i].date) >= 0) liste.splice(i, 1);
+    }
+    dates.forEach(function (date) {
+      lignes.forEach(function (l) {
+        liste.push(l.chantier
+          ? { date: date, salarie: sal, chantier: l.chantier, chantierNom: '', debut: l.debut, fin: l.fin, pause: Number(l.pause) || 0, remarque: l.remarque || '' }
+          : { date: date, salarie: sal, chantier: '', chantierNom: '', debut: '', fin: '', pause: 0, remarque: l.remarque || 'Absent' });
+      });
+    });
+  }
+
+  // 'type|salarié|date' → { etat: 'envoi' | 'ok' | 'erreur', lignes, message }
+  var ENVOIS = {};
+  var fileEnvois = Promise.resolve();
+
+  function etatEnvoi(type, sal, date) {
+    var e = ENVOIS[type + '|' + sal + '|' + date];
+    return e && e.etat !== 'ok' ? e.etat : '';
+  }
+
+  /**
+   * La saisie s'affiche tout de suite, l'envoi part derrière. Tant que Google n'a pas confirmé,
+   * la journée porte « Envoi… » ; en cas d'échec, « Non enregistré » en rose, avec de quoi réessayer.
+   */
+  function envoyer(o) {
+    var sals = o.sals || [o.sal];
+    var cles = [];
+    sals.forEach(function (sal) {
+      o.dates.forEach(function (dt) { cles.push(o.type + '|' + sal + '|' + dt); });
+      appliquerLocal(o.per[o.type], sal, o.dates, o.lignes);
+    });
+    cles.forEach(function (k) { ENVOIS[k] = { etat: 'envoi', lignes: o.lignes }; });
+    o.redessiner();
+    fileEnvois = fileEnvois.then(function () {
+      return api(o.action, o.donnees).then(function () {
+        cles.forEach(function (k) { if (ENVOIS[k].lignes === o.lignes) ENVOIS[k].etat = 'ok'; });
+        o.redessiner();
+        toast('Enregistré ✓');
+      }, function (err) {
+        cles.forEach(function (k) { if (ENVOIS[k].lignes === o.lignes) { ENVOIS[k].etat = 'erreur'; ENVOIS[k].message = err.message; } });
+        o.redessiner();
+        toast('Non enregistré : ' + err.message);
+      });
+    });
+  }
+
+  /** Les mêmes contrôles que Google, faits avant d'envoyer : un refus ne doit pas arriver après coup. */
+  function valider(lignes) {
+    var tri = lignes.filter(function (l) { return l.chantier; }).slice().sort(function (a, b) { return min(a.debut) - min(b.debut); });
+    for (var i = 0; i < tri.length; i++) {
+      var dur = min(tri[i].fin) - min(tri[i].debut);
+      if (dur <= 0) return 'L\'heure de fin doit être après l\'heure de début.';
+      if ((Number(tri[i].pause) || 0) >= dur) return 'La pause est plus longue que le créneau.';
+      if (i && min(tri[i].debut) < min(tri[i - 1].fin)) return 'Deux créneaux se chevauchent : ' + tri[i - 1].debut + '–' + tri[i - 1].fin + ' et ' + tri[i].debut + '–' + tri[i].fin + '.';
+    }
+    return '';
+  }
+
+  // ------------------------------------------------------------------------------------------
+  // Fenêtre de saisie d'une journée (salarié et responsables)
+  // ------------------------------------------------------------------------------------------
+  /**
+   * o = { titre, date, lignes, chantiers (liste), libelleAbsence, joursSupp (dates proposées),
+   *       peutEffacer, enregistrer(lignes, joursCoches) -> Promise }
+   */
+  function fenetreJour(o) {
+    var actifs = o.chantiers.filter(function (c) { return c.actif; });
+    var lignes = (o.lignes || []).map(function (l) { return Object.assign({}, l); });
+    var absent = lignes.length === 1 && !lignes[0].chantier;
+    var motif = absent ? lignes[0].remarque : '';
+    if (absent || !lignes.length) lignes = [ligneVide(null)];
+
+    function ligneVide(avant) {
+      return avant ? { chantier: '', debut: avant.fin, fin: '', pause: 0, remarque: '' }
+        : { chantier: '', debut: '08:00', fin: '17:00', pause: 60, remarque: '' };
+    }
+
+    var voile = el('<div class="voile"></div>');
+    var f = el('<div class="fenetre"></div>');
+    voile.appendChild(f);
+    document.body.appendChild(voile);
+    document.body.style.overflow = 'hidden';
+    function fermer() { voile.remove(); document.body.style.overflow = ''; }
+
+    function optionsChantier(sel) {
+      var liste = actifs.slice();
+      if (sel && !actifs.some(function (c) { return c.id === sel; })) {
+        var ancien = o.chantiers.filter(function (c) { return c.id === sel; })[0];
+        if (ancien) liste.unshift(ancien);
+      }
+      return '<option value="">— Choisir le chantier —</option>' + liste.map(function (c) {
+        return '<option value="' + esc(c.id) + '"' + (c.id === sel ? ' selected' : '') + '>' + esc(c.nom) + '</option>';
+      }).join('');
+    }
+    function optionsPause(p) {
+      var liste = PAUSES.indexOf(Number(p)) >= 0 ? PAUSES : PAUSES.concat([Number(p)]).sort(function (a, b) { return a - b; });
+      return liste.map(function (v) { return '<option value="' + v + '"' + (v === Number(p) ? ' selected' : '') + '>' + (v ? fh(v) : '0') + '</option>'; }).join('');
+    }
+
+    function dessiner(message) {
+      var h = '<h2>' + esc(o.titre) + '</h2><div class="sous">' + esc(jourLong(o.date)) + '</div>';
+      h += '<label class="case-a-cocher"><input type="checkbox" data-absent' + (absent ? ' checked' : '') + '> ' + esc(o.libelleAbsence) + '</label>';
+      if (absent) {
+        h += '<label class="champ"><span>Motif</span><input type="text" data-motif maxlength="120" placeholder="Congé, maladie, formation…" value="' + esc(motif) + '"></label>';
+      } else {
+        lignes.forEach(function (l, i) {
+          h += '<div class="ligne-saisie" data-i="' + i + '">'
+            + '<label class="champ"><span>Chantier' + (lignes.length > 1 ? ' ' + (i + 1) : '') + '</span><select data-k="chantier">' + optionsChantier(l.chantier) + '</select></label>'
+            + '<div class="trio">'
+            + '<label class="champ"><span>Début</span><input type="text" inputmode="numeric" autocomplete="off" maxlength="5" placeholder="--:--" data-k="debut" data-heure value="' + esc(l.debut) + '"></label>'
+            + '<label class="champ"><span>Fin</span><input type="text" inputmode="numeric" autocomplete="off" maxlength="5" placeholder="--:--" data-k="fin" data-heure value="' + esc(l.fin) + '"></label>'
+            + '<label class="champ"><span>Pause</span><select data-k="pause">' + optionsPause(l.pause) + '</select></label>'
+            + '</div>'
+            + '<div class="aide-heure">Tapez l\'heure au clavier : 0830 ou 830 pour 8h30, 17 pour 17h00.</div>'
+            + '<div class="duree" data-duree></div>'
+            + '<label class="champ" style="margin-top:10px"><span>Remarque (facultatif)</span><input type="text" data-k="remarque" maxlength="300" value="' + esc(l.remarque) + '"></label>'
+            + (lignes.length > 1 ? '<button type="button" class="lien-btn" data-retirer="' + i + '">Retirer ce chantier</button>' : '')
+            + '</div>';
+        });
+        h += '<button type="button" class="btn second plein" data-ajouter>+ Un autre chantier ce jour-là</button>';
+      }
+      if (o.joursSupp && o.joursSupp.length) {
+        h += '<div class="bloc" style="margin-top:14px"><div class="bloc-titre">Appliquer aussi à</div><div class="jours-supp">'
+          + o.joursSupp.map(function (j) { return '<label class="case-a-cocher"><input type="checkbox" data-jour="' + j + '"' + (joursCoches[j] ? ' checked' : '') + '> ' + esc(jourCourt(j)) + '</label>'; }).join('')
+          + '</div></div>';
+      }
+      if (o.autresSalaries && o.autresSalaries.length) {
+        h += '<div class="bloc" style="margin-top:6px"><div class="bloc-titre">Et à ces salariés (leur planning de ces jours sera remplacé)</div><div class="jours-supp">'
+          + o.autresSalaries.map(function (x) { return '<label class="case-a-cocher"><input type="checkbox" data-sal="' + esc(x.id) + '"' + (salCoches[x.id] ? ' checked' : '') + '> ' + esc(x.nom) + '</label>'; }).join('')
+          + '</div></div>';
+      }
+      if (message) h += '<div class="erreur-saisie">' + esc(message) + '</div>';
+      h += '<div class="pied"><button type="button" class="btn second" data-annuler>Annuler</button><button type="button" class="btn" data-ok>Enregistrer</button></div>';
+      if (o.peutEffacer) h += '<div style="text-align:center;margin-top:6px"><button type="button" class="lien-btn" data-effacer>Effacer cette journée</button></div>';
+      f.innerHTML = h;
+      majDurees();
+    }
+
+    var joursCoches = {}, salCoches = {};
+    function lireCoches() {
+      f.querySelectorAll('[data-jour]').forEach(function (c) { joursCoches[c.getAttribute('data-jour')] = c.checked; });
+      f.querySelectorAll('[data-sal]').forEach(function (c) { salCoches[c.getAttribute('data-sal')] = c.checked; });
+    }
+    function lireChamps() {
+      lireCoches();
+      if (absent) { var m = f.querySelector('[data-motif]'); motif = m ? m.value : motif; return; }
+      f.querySelectorAll('.ligne-saisie').forEach(function (bloc) {
+        var l = lignes[Number(bloc.getAttribute('data-i'))];
+        bloc.querySelectorAll('[data-k]').forEach(function (c) {
+          var k = c.getAttribute('data-k');
+          l[k] = k === 'pause' ? Number(c.value) : c.hasAttribute('data-heure') ? (lireHeure(c.value) || c.value.trim()) : c.value;
+        });
+      });
+    }
+    function majDurees() {
+      f.querySelectorAll('.ligne-saisie').forEach(function (bloc) {
+        var l = lignes[Number(bloc.getAttribute('data-i'))];
+        var ok = /^\d\d:\d\d$/.test(l.debut) && /^\d\d:\d\d$/.test(l.fin) && min(l.fin) > min(l.debut);
+        bloc.querySelector('[data-duree]').textContent = ok ? 'Temps de travail : ' + fh(Math.max(0, min(l.fin) - min(l.debut) - l.pause)) : '';
+      });
+    }
+
+    f.addEventListener('input', function () { lireChamps(); majDurees(); });
+    // En touchant un champ d'heure, tout est sélectionné : on tape la nouvelle heure directement
+    f.addEventListener('focusin', function (e) {
+      if (e.target.hasAttribute && e.target.hasAttribute('data-heure')) setTimeout(function () { e.target.select(); }, 0);
+    });
+    // En quittant un champ d'heure, « 830 » devient « 08:30 »
+    f.addEventListener('focusout', function (e) {
+      if (!e.target.hasAttribute || !e.target.hasAttribute('data-heure')) return;
+      var h = lireHeure(e.target.value);
+      if (h) e.target.value = h;
+    });
+    f.addEventListener('change', function (e) {
+      if (e.target.hasAttribute('data-absent')) { lireChamps(); absent = e.target.checked; dessiner(); return; }
+      lireChamps(); majDurees();
+    });
+    f.addEventListener('click', function (e) {
+      var b = e.target.closest('button');
+      if (!b) return;
+      if (b.hasAttribute('data-annuler')) { fermer(); return; }
+      if (b.hasAttribute('data-ajouter')) { lireChamps(); lignes.push(ligneVide(lignes[lignes.length - 1])); dessiner(); return; }
+      if (b.hasAttribute('data-retirer')) { lireChamps(); lignes.splice(Number(b.getAttribute('data-retirer')), 1); dessiner(); return; }
+      if (b.hasAttribute('data-effacer')) { validerEtFermer([]); return; }
+      if (b.hasAttribute('data-ok')) {
+        lireChamps();
+        var a_envoyer;
+        if (absent) a_envoyer = [{ chantier: '', remarque: motif.trim() || 'Absent' }];
+        else {
+          if (lignes.some(function (l) { return !l.chantier; })) { dessiner('Choisissez le chantier.'); return; }
+          if (lignes.some(function (l) { return !l.debut || !l.fin; })) { dessiner('Indiquez l\'heure de début et de fin.'); return; }
+          if (lignes.some(function (l) { return !/^\d\d:\d\d$/.test(l.debut) || !/^\d\d:\d\d$/.test(l.fin); })) {
+            dessiner('Heure illisible : tapez par exemple 0830 pour 8h30.'); return;
+          }
+          a_envoyer = lignes.map(function (l) { return { chantier: l.chantier, debut: l.debut, fin: l.fin, pause: l.pause, remarque: l.remarque }; });
+          var probleme = valider(a_envoyer);
+          if (probleme) { dessiner(probleme); return; }
+        }
+        validerEtFermer(a_envoyer);
+      }
+    });
+
+    function validerEtFermer(liste) {
+      var coches = Array.prototype.map.call(f.querySelectorAll('[data-jour]:checked'), function (c) { return c.getAttribute('data-jour'); });
+      var sals = Array.prototype.map.call(f.querySelectorAll('[data-sal]:checked'), function (c) { return c.getAttribute('data-sal'); });
+      fermer();
+      o.enregistrer(liste, coches, sals);
+    }
+
+    dessiner();
+  }
+
+  // ------------------------------------------------------------------------------------------
+  // Vue du salarié
+  // ------------------------------------------------------------------------------------------
+  var S = null;            // données chargées : { id, nom, aujourdhui, limite, chantiers, du, au, prevu, reel }
+  var lundiAffiche = null;
+
+  function salarie(r) {
+    document.getElementById('quoi').textContent = 'Mes heures';
+    document.getElementById('qui').textContent = r.nom;
+    app.classList.add('etroit');
+    S = r; lundiAffiche = lundiDe(r.aujourdhui); dessinerSalarie();
+  }
+
+  function dessinerSalarie() {
+    var chantiers = {};
+    S.chantiers.forEach(function (c) { chantiers[c.id] = c; });
+    var pr = parJour(S.prevu), re = parJour(S.reel);
+    var h = '<div class="semaine-nav"><button type="button" class="btn second" data-sem="-7" aria-label="Semaine précédente">◀</button>'
+      + '<div class="titre">' + esc(titreSemaine(lundiAffiche)) + '</div>'
+      + '<button type="button" class="btn second" data-sem="7" aria-label="Semaine suivante">▶</button></div>';
+    if (lundiAffiche !== lundiDe(S.aujourdhui)) h += '<div style="text-align:center;margin:-6px 0 12px"><button type="button" class="lien-btn" data-sem="0">Revenir à cette semaine</button></div>';
+    h += htmlApercu(pr, chantiers);
+
+    for (var i = 0; i < 7; i++) {
+      var date = plusJours(lundiAffiche, i);
+      var cle = S.id + '|' + date;
+      var p = pr[cle] || [], r = re[cle] || [];
+      if (i === 6 && !p.length && !r.length) continue;
+      var modifiable = date <= S.aujourdhui && date >= S.limite;
+      var auj = date === S.aujourdhui;
+      var ev = etatEnvoi('reel', S.id, date);
+      var etiquette = ev === 'envoi' ? '<span class="etiquette attente">Envoi…</span>'
+        : ev === 'erreur' ? '<span class="etiquette manque">Non enregistré</span>'
+          : auj ? '<span class="etiquette auj">Aujourd\'hui</span>'
+            : r.length ? '<span class="etiquette ok">Saisi</span>'
+              : (p.length && date < S.aujourdhui && p[0].chantier) ? '<span class="etiquette manque">Pas saisi</span>' : '';
+      h += '<div class="jour' + (auj ? ' aujourdhui' : '') + '" id="jour-' + date + '"><div class="jour-tete"><span class="jour-nom">' + esc(jourLong(date)) + '</span>' + etiquette + '</div>';
+      var prevuCoupe = '';
+      [true, false].forEach(function (m) {
+        var g = pourMoment(p, m);
+        if (g.length) prevuCoupe += '<div class="moitie' + (prevuCoupe ? ' suite' : '') + '">' + htmlLignes(g, chantiers, true) + '</div>';
+      });
+      var blocPrevu = '<div class="bloc"><div class="bloc-titre">Prévu</div>' + (prevuCoupe || '<div class="vide">Rien de prévu</div>') + '</div>';
+      if (r.length) {
+        // Le matin en face du matin, l'après-midi en face de l'après-midi ; un créneau qui
+        // commence avant 12h et finit après 12h apparaît aux deux
+        h += '<div class="cote-a-cote"><div class="bloc-titre">Prévu</div><div class="bloc-titre reel">Mes heures</div>';
+        [true, false].forEach(function (estMatin) {
+          var gp = pourMoment(p, estMatin);
+          var gr = pourMoment(r, estMatin);
+          if (!gp.length && !gr.length) return;
+          h += '<div class="demi' + (estMatin ? '' : ' suite') + '">' + (gp.length ? htmlLignes(gp, chantiers, true) : '<div class="vide">—</div>') + '</div>'
+            + '<div class="demi reel' + (estMatin ? '' : ' suite') + '">' + (gr.length ? htmlLignes(gr, chantiers, false) : '<div class="vide">—</div>') + '</div>';
+        });
+        h += '</div>';
+      } else {
+        h += blocPrevu;
+      }
+      if (ev === 'erreur') {
+        h += '<div class="message erreur" style="margin:10px 0 0">Ces heures ne sont pas arrivées au bureau : ' + esc(ENVOIS['reel|' + S.id + '|' + date].message) + '</div>'
+          + '<div class="actions-jour"><button type="button" class="btn plein" data-renvoyer="' + date + '">Réessayer l\'envoi</button></div>';
+      }
+      if (modifiable) {
+        h += '<div class="actions-jour">';
+        if (!r.length && p.length) h += '<button type="button" class="btn plein" data-comme="' + date + '">J\'ai fait comme prévu</button>';
+        h += '<button type="button" class="btn ' + (!r.length && p.length ? 'second ' : '') + 'plein" data-saisir="' + date + '">'
+          + (r.length ? 'Corriger mes heures' : p.length ? 'Autres heures ou autre chantier' : 'Saisir mes heures') + '</button></div>';
+      } else if (date < S.limite && !r.length && p.length) {
+        h += '<div class="verrou">Jour trop ancien pour être saisi ici : voyez avec le bureau.</div>';
+      }
+      h += '</div>';
+    }
+    app.innerHTML = h;
+  }
+  function lundiDe(s) { var j = d(s).getUTCDay(); return plusJours(s, j === 0 ? -6 : 1 - j); }
+
+  /**
+   * Tableau de la semaine : un jour par colonne, matin et après-midi en lignes, le chantier prévu dans chaque case.
+   * Un créneau qui commence avant 12h est du matin ; un créneau qui finit après 12h est de l'après-midi :
+   * une journée 8h–17h apparaît donc dans les deux.
+   */
+  function htmlApercu(pr, chantiers) {
+    var jours = [];
+    for (var i = 0; i < 7; i++) {
+      var dt = plusJours(lundiAffiche, i);
+      if (i < 6 || pr[S.id + '|' + dt]) jours.push(dt);
+    }
+    var LETTRES = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
+    var texte = function (lignes) {
+      var noms = [];
+      lignes.forEach(function (l) {
+        var n = l.chantier ? (chantiers[l.chantier] ? chantiers[l.chantier].nom : l.chantierNom) : (l.remarque || 'Absent');
+        if (noms.indexOf(n) < 0) noms.push(n);
+      });
+      return noms.length ? noms.map(esc).join('<br>') : '<span class="vide">·</span>';
+    };
+    var h = '<table class="apercu"><thead><tr><th></th>' + jours.map(function (dt) {
+      return '<th class="' + (dt === S.aujourdhui ? 'auj' : '') + '">' + LETTRES[d(dt).getUTCDay()] + '<span>' + d(dt).getUTCDate() + '</span></th>';
+    }).join('') + '</tr></thead><tbody>';
+    [['Matin', auMatin], ['Aprèm', aLApresMidi]].forEach(function (moment) {
+      h += '<tr><th class="moment">' + moment[0] + '</th>' + jours.map(function (dt) {
+        var lignes = (pr[S.id + '|' + dt] || []).filter(moment[1]);
+        return '<td><button type="button" class="ap-case' + (dt === S.aujourdhui ? ' auj' : '') + '" data-aller="' + dt + '" aria-label="Voir le ' + esc(jourLong(dt)) + '">' + texte(lignes) + '</button></td>';
+      }).join('') + '</tr>';
+    });
+    // Nombre d'heures prévues dans la journée (pauses déduites)
+    h += '<tr><th class="moment">Heures</th>' + jours.map(function (dt) {
+      var tp = total(pr[S.id + '|' + dt] || []);
+      var t = tp ? hCourt(tp) : '<span class="vide">·</span>';
+      return '<td><button type="button" class="ap-case heures' + (dt === S.aujourdhui ? ' auj' : '') + '" data-aller="' + dt + '" aria-label="Voir le ' + esc(jourLong(dt)) + '">' + t + '</button></td>';
+    }).join('') + '</tr>';
+    return h + '</tbody></table>';
+  }
+
+  function enregistrerSalarie(date, lignes) {
+    envoyer({ type: 'reel', per: S, sal: S.id, dates: [date], lignes: lignes,
+      action: 'moi.enregistrer', donnees: { date: date, lignes: lignes }, redessiner: dessinerSalarie });
+  }
+
+  app.addEventListener('click', function (e) {
+    if (CONF.role !== 'salarie') return;
+    var b = e.target.closest('button');
+    if (!b) return;
+    if (b.hasAttribute('data-sem')) {
+      var n = Number(b.getAttribute('data-sem'));
+      lundiAffiche = n === 0 ? lundiDe(S.aujourdhui) : plusJours(lundiAffiche, n);
+      naviguer(S, lundiAffiche, 'moi.semaine', dessinerSalarie);
+      return;
+    }
+    if (b.hasAttribute('data-aller')) {
+      var carte = document.getElementById('jour-' + b.getAttribute('data-aller'));
+      if (carte) carte.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    if (b.hasAttribute('data-renvoyer')) {
+      var jr = b.getAttribute('data-renvoyer');
+      enregistrerSalarie(jr, ENVOIS['reel|' + S.id + '|' + jr].lignes);
+      return;
+    }
+    if (b.hasAttribute('data-comme')) {
+      var date = b.getAttribute('data-comme');
+      var p = parJour(S.prevu)[S.id + '|' + date] || [];
+      enregistrerSalarie(date, p.map(function (l) { return { chantier: l.chantier, debut: l.debut, fin: l.fin, pause: l.pause, remarque: l.chantier ? '' : l.remarque }; }));
+      return;
+    }
+    if (b.hasAttribute('data-saisir')) {
+      var jour = b.getAttribute('data-saisir');
+      var reel = parJour(S.reel)[S.id + '|' + jour] || [];
+      var prevu = parJour(S.prevu)[S.id + '|' + jour] || [];
+      var depart = reel.length ? reel : prevu.filter(function (l) { return l.chantier; }).map(function (l) { return Object.assign({}, l, { remarque: '' }); });
+      fenetreJour({
+        titre: reel.length ? 'Corriger mes heures' : 'Mes heures', date: jour, lignes: depart,
+        chantiers: S.chantiers, libelleAbsence: 'Je n\'ai pas travaillé ce jour-là', peutEffacer: reel.length > 0,
+        enregistrer: function (lignes) { enregistrerSalarie(jour, lignes); }
+      });
+    }
+  });
+
+  // ------------------------------------------------------------------------------------------
+  // Vue des responsables
+  // ------------------------------------------------------------------------------------------
+  var A = { init: null, d: null, lundi: null, mois: null, onglet: 'planning', dimanche: false }; // d = environ trois mois chargés
+
+  function responsable(r) {
+    document.getElementById('qui').textContent = r.nom;
+    A.init = r.init; A.d = r.d; A.lundi = lundiDe(r.d.aujourdhui); A.mois = r.d.aujourdhui.slice(0, 7); dessinerAdmin();
+  }
+
+  // Un envoi qui se termine ne redessine pas l'onglet Réglages : on y perdrait ce qui est en cours de frappe
+  function redessinerGrille() { if (A.onglet !== 'reglages') dessinerAdmin(); }
+
+  // ------------------------------------------------------------------------------------------
+  // Export du planning sur plusieurs semaines, en A4 portrait
+  // ------------------------------------------------------------------------------------------
+  function choisirSemaines() {
+    var voile = el('<div class="voile"></div>');
+    var f = el('<div class="fenetre"><h2>Exporter le planning en PDF</h2>'
+      + '<div class="sous">À partir de la ' + esc(titreSemaine(A.lundi).replace('Semaine', 'semaine')) + ', A4 portrait</div>'
+      + '<div class="bloc-titre">Nombre de semaines</div><div class="choix-semaines">'
+      + [1, 2, 3, 4, 5, 6].map(function (n) { return '<button type="button" class="btn ' + (n === 4 ? '' : 'second ') + '" data-nb="' + n + '">' + n + '</button>'; }).join('')
+      + '</div><div class="pied"><button type="button" class="btn second" data-annuler>Annuler</button></div></div>');
+    voile.appendChild(f);
+    document.body.appendChild(voile);
+    f.addEventListener('click', function (e) {
+      var b = e.target.closest('button');
+      if (!b) return;
+      if (b.hasAttribute('data-annuler')) { voile.remove(); return; }
+      if (b.hasAttribute('data-nb')) { voile.remove(); exporterSemaines(Number(b.getAttribute('data-nb'))); }
+    });
+  }
+
+  function exporterSemaines(n) {
+    var du = A.lundi, au = plusJours(A.lundi, 7 * n - 1);
+    if (du >= A.d.du && au <= A.d.au) { imprimerSemaines(n); return; }
+    toast('Préparation du PDF…');
+    api('admin.semaine', { du: du < A.d.du ? du : A.d.du, au: au > A.d.au ? au : A.d.au }).then(function (r) {
+      fusionner(A.d, r);
+      imprimerSemaines(n);
+    }).catch(function (e) { toast(e.message); });
+  }
+
+  function imprimerSemaines(n) {
+    var ch = chantiersParId();
+    var pr = parJour(A.d.prevu), re = parJour(A.d.reel);
+    var fin = plusJours(A.lundi, 7 * n - 1);
+    var h = '<div class="impr-tete"><span><b>Vosges Rénovation — Planning</b> — du ' + esc(jourLong(A.lundi).toLowerCase()) + ' au ' + esc(jourLong(fin).toLowerCase()) + ' ' + fin.slice(0, 4) + '</span>'
+      + '<span class="impr-legende"><span class="pastille"></span> heures saisies (sinon : prévu)</span></div>';
+    for (var w = 0; w < n; w++) {
+      var lundi = plusJours(A.lundi, 7 * w);
+      var jours = [];
+      for (var i = 0; i < 7; i++) {
+        var j = plusJours(lundi, i);
+        var dimancheUtile = A.dimanche || A.init.salaries.some(function (s) { return pr[s.id + '|' + j] || re[s.id + '|' + j]; });
+        if (i < 6 || dimancheUtile) jours.push(j);
+      }
+      var salaries = A.init.salaries.filter(function (s) {
+        return s.actif || jours.some(function (j) { return pr[s.id + '|' + j] || re[s.id + '|' + j]; });
+      });
+      h += '<div class="impr-semaine"><div class="impr-titre">' + esc(titreSemaine(lundi)) + '</div><table class="impr"><thead><tr><th class="n"></th>'
+        + jours.map(function (j) { return '<th>' + esc(jourCourt(j)) + '</th>'; }).join('') + '<th class="t">Semaine</th></tr></thead><tbody>';
+      salaries.forEach(function (s) {
+        var totP = 0, totR = 0;
+        h += '<tr><td class="n">' + esc(s.nom) + '</td>';
+        jours.forEach(function (j) {
+          var p = pr[s.id + '|' + j] || [], r = re[s.id + '|' + j] || [];
+          totP += total(p); totR += total(r);
+          var montre = r.length ? r : p;
+          var t = r.length ? total(r) : total(p);
+          h += '<td class="' + (r.length ? 'r' : '') + '">' + htmlCaseSimple(montre, ch)
+            + (t ? '<div class="hj">' + hCourt(t) + (r.length ? ' faites' : ' prévues') + '</div>' : '') + '</td>';
+        });
+        h += '<td class="t">Prévu ' + hCourt(totP) + '<br>Fait ' + hCourt(totR) + '</td></tr>';
+      });
+      h += '</tbody></table></div>';
+    }
+    var zone = document.getElementById('impression');
+    zone.innerHTML = h;
+    var page = document.createElement('style');
+    page.textContent = '@page { size: A4 portrait; margin: 8mm; }';
+    document.head.appendChild(page);
+    document.body.classList.add('impr-multi');
+    var nettoyer = function () {
+      document.body.classList.remove('impr-multi');
+      page.remove();
+      zone.innerHTML = '';
+      window.removeEventListener('afterprint', nettoyer);
+    };
+    window.addEventListener('afterprint', nettoyer);
+    toast('Dans la fenêtre qui s\'ouvre, choisissez « Enregistrer au format PDF ».');
+    setTimeout(function () { window.print(); }, 150);
+  }
+
+  /** Le compteur d'un mois hors de la période déjà chargée va chercher ce mois. */
+  function chargerMoisSiBesoin() {
+    if (A.onglet !== 'compteur') return;
+    var b = bornesMois(A.mois);
+    if (b.du >= A.d.du && b.au <= A.d.au) return;
+    var mois = A.mois;
+    api('admin.semaine', { du: b.du < A.d.du ? b.du : A.d.du, au: b.au > A.d.au ? b.au : A.d.au }).then(function (r) {
+      fusionner(A.d, r);
+      if (A.onglet === 'compteur' && A.mois === mois) dessinerAdmin();
+    }).catch(function (e) { toast(e.message); });
+  }
+
+  /** Marque d'une case dont l'envoi est en cours ou a échoué. */
+  function marqueEnvoi(type, sal, date) {
+    var e = etatEnvoi(type, sal, date);
+    if (e === 'envoi') return '<div class="note">envoi…</div>';
+    if (e === 'erreur') return '<div class="ecart txt-neg">Non enregistré : cliquez pour refaire</div>';
+    return '';
+  }
+
+  function chantiersParId() { var m = {}; A.init.chantiers.forEach(function (c) { m[c.id] = c; }); return m; }
+
+  function dessinerAdmin() {
+    var h = '<div class="onglets">'
+      + [['planning', 'Planning'], ['reel', 'Prévu / Réel'], ['compteur', 'Compteur'], ['reglages', 'Réglages']].map(function (o) {
+        return '<button type="button" class="onglet' + (A.onglet === o[0] ? ' actif' : '') + '" data-onglet="' + o[0] + '">' + o[1] + '</button>';
+      }).join('') + '</div>';
+    if (A.onglet === 'reglages') h += htmlReglages();
+    else if (A.onglet === 'compteur') h += htmlCompteur();
+    else h += htmlGrille(A.onglet);
+    app.innerHTML = h;
+  }
+
+  var NOMS_MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+  function bornesMois(mois) {
+    var a = Number(mois.slice(0, 4)), m = Number(mois.slice(5, 7));
+    var dernier = new Date(Date.UTC(a, m, 0)).getUTCDate();
+    return { du: mois + '-01', au: mois + '-' + (dernier < 10 ? '0' : '') + dernier };
+  }
+  function moisVoisin(mois, n) {
+    var x = new Date(Date.UTC(Number(mois.slice(0, 4)), Number(mois.slice(5, 7)) - 1 + n, 1));
+    return x.toISOString().slice(0, 7);
+  }
+
+  /** Heures faites (réel saisi) de chaque salarié : une colonne par semaine du mois, et le total du mois. */
+  function htmlCompteur() {
+    var b = bornesMois(A.mois);
+    var h = '<div class="barre">'
+      + '<button type="button" class="btn second petit" data-mois="-1" aria-label="Mois précédent">◀</button>'
+      + '<span class="titre">' + maj(NOMS_MOIS[Number(A.mois.slice(5, 7)) - 1]) + ' ' + A.mois.slice(0, 4) + '</span>'
+      + '<button type="button" class="btn second petit" data-mois="1" aria-label="Mois suivant">▶</button>'
+      + (A.mois !== A.d.aujourdhui.slice(0, 7) ? '<button type="button" class="btn second petit" data-mois="0">Ce mois-ci</button>' : '')
+      + '<span class="espace"></span>'
+      + '<button type="button" class="btn second petit" data-imprimer>Exporter en PDF</button></div>'
+      + '<div class="titre-impression">Vosges Rénovation — Heures faites — ' + maj(NOMS_MOIS[Number(A.mois.slice(5, 7)) - 1]) + ' ' + A.mois.slice(0, 4) + '</div>';
+    if (b.du < A.d.du || b.au > A.d.au) return h + '<div class="chargement">Chargement…</div>';
+
+    // Semaines du mois : du lundi au dimanche, limitées aux jours du mois
+    var semaines = [];
+    for (var l = lundiDe(b.du); l <= b.au; l = plusJours(l, 7)) {
+      var du = l < b.du ? b.du : l, au = plusJours(l, 6) > b.au ? b.au : plusJours(l, 6);
+      semaines.push({ du: du, au: au });
+    }
+    var fait = {};
+    A.d.reel.forEach(function (x) {
+      if (x.date < b.du || x.date > b.au) return;
+      var k = x.salarie + '|' + x.date;
+      fait[k] = (fait[k] || 0) + duree(x);
+    });
+    var salaries = A.init.salaries.filter(function (s) {
+      return s.actif || A.d.reel.some(function (x) { return x.salarie === s.id && x.date >= b.du && x.date <= b.au; });
+    });
+    var court = function (dt) { return d(dt).getUTCDate(); };
+    h += '<div class="grille-cadre"><table class="compteur"><thead><tr><th class="col-nom"></th>'
+      + semaines.map(function (w) {
+        return '<th>Semaine<br><span>' + (w.du === w.au ? court(w.du) : court(w.du) + ' → ' + court(w.au)) + ' ' + MOIS[d(w.au).getUTCMonth()] + '</span></th>';
+      }).join('') + '<th class="tot">Total du mois</th></tr></thead><tbody>';
+    salaries.forEach(function (s) {
+      var totMois = 0;
+      h += '<tr><td class="nom' + (s.actif ? '' : ' inactif') + '">' + esc(s.nom) + '</td>';
+      semaines.forEach(function (w) {
+        var t = 0;
+        for (var dt = w.du; dt <= w.au; dt = plusJours(dt, 1)) t += fait[s.id + '|' + dt] || 0;
+        totMois += t;
+        h += '<td>' + (t ? hCourt(t) : '<span class="vide">—</span>') + '</td>';
+      });
+      h += '<td class="tot">' + hCourt(totMois) + '</td></tr>';
+    });
+    return h + '</tbody></table></div>'
+      + '<p class="aide-compteur">Heures réellement saisies (pauses déduites). Une semaine à cheval sur deux mois ne compte ici que ses jours du mois.</p>';
+  }
+
+  function joursAffiches() {
+    var j = [];
+    for (var i = 0; i < (A.dimanche ? 7 : 6); i++) j.push(plusJours(A.lundi, i));
+    return j;
+  }
+
+  /** « 08:00 » → « 8h », « 12:30 » → « 12h30 » : les cases sont étroites. */
+  function hc(h) { var x = String(h).split(':'); return Number(x[0]) + 'h' + (x[1] && x[1] !== '00' ? x[1] : ''); }
+  function auMatin(l) { return !l.chantier || min(l.debut) < 12 * 60; }
+  function aLApresMidi(l) { return !l.chantier || min(l.fin) > 12 * 60; }
+  function dansMoment(l, matin) { return matin ? auMatin(l) : aLApresMidi(l); }
+  /**
+   * Créneaux à montrer pour le matin ou l'après-midi. Un créneau qui commence avant 12h et finit après
+   * est montré coupé : le matin jusqu'à 12h, l'après-midi à partir de 12h + la pause (on suppose la pause
+   * prise à midi : l'appli ne connaît pas son heure). Affichage seulement : l'enregistrement ne change pas,
+   * et les deux moitiés font le même total que le créneau entier.
+   */
+  function pourMoment(lignes, matin) {
+    return lignes.filter(function (l) { return dansMoment(l, matin); }).map(function (l) {
+      if (!l.chantier || !(auMatin(l) && aLApresMidi(l))) return l;
+      var pause = Number(l.pause) || 0;
+      var reprise = Math.min(12 * 60 + pause, min(l.fin));
+      var hhmm = function (m) { return (m < 600 ? '0' : '') + Math.floor(m / 60) + ':' + (m % 60 < 10 ? '0' : '') + (m % 60); };
+      return matin
+        ? Object.assign({}, l, { fin: '12:00', pause: 0 })
+        : Object.assign({}, l, { debut: hhmm(reprise), pause: 0, remarque: '' });
+    });
+  }
+
+  function lignesCompactes(lignes, ch) {
+    return lignes.map(function (l) {
+      if (!l.chantier) return '<div class="ch">' + esc(l.remarque || 'Absent') + '</div>';
+      var nom = ch[l.chantier] ? ch[l.chantier].nom : l.chantierNom;
+      return '<div class="ch">' + esc(nom) + '</div><div class="h">' + hc(l.debut) + '–<wbr>' + hc(l.fin) + '</div>'
+        + (l.pause ? '<div class="h">pause ' + hCourt(l.pause) + '</div>' : '')
+        + (l.remarque ? '<div class="note">' + esc(l.remarque) + '</div>' : '');
+    }).join('');
+  }
+
+  /** Prévu à gauche, réel à droite ; le matin en haut, l'après-midi en bas (une journée 8h–17h est aux deux). */
+  function htmlCaseDouble(p, r, ch) {
+    var h = '';
+    [true, false].forEach(function (matin) {
+      var gp = pourMoment(p, matin);
+      var gr = pourMoment(r, matin);
+      if (!gp.length && !gr.length) return;
+      h += '<div class="dbl' + (matin ? '' : ' suite') + '"><div class="dbl-c">' + lignesCompactes(gp, ch) + '</div>'
+        + '<div class="dbl-c r">' + lignesCompactes(gr, ch) + '</div></div>';
+    });
+    return h;
+  }
+
+  /** Une seule série de créneaux : le matin en haut, l'après-midi en bas. */
+  function htmlCaseSimple(lignes, ch) {
+    var h = '';
+    [true, false].forEach(function (matin) {
+      var g = pourMoment(lignes, matin);
+      if (g.length) h += '<div class="simple' + (h ? ' suite' : '') + '">' + lignesCompactes(g, ch) + '</div>';
+    });
+    return h;
+  }
+
+  function htmlGrille(mode) {
+    var ch = chantiersParId();
+    var pr = parJour(A.d.prevu), re = parJour(A.d.reel);
+    var jours = joursAffiches();
+    var auj = A.d.aujourdhui;
+    var salaries = A.init.salaries.filter(function (s) {
+      return s.actif || jours.some(function (j) { return pr[s.id + '|' + j] || re[s.id + '|' + j]; });
+    });
+
+    var h = '<div class="barre">'
+      + '<button type="button" class="btn second petit" data-semaine="-7" aria-label="Semaine précédente">◀</button>'
+      + '<span class="titre">' + esc(titreSemaine(A.lundi)) + '</span>'
+      + '<button type="button" class="btn second petit" data-semaine="7" aria-label="Semaine suivante">▶</button>'
+      + (A.lundi !== lundiDe(auj) ? '<button type="button" class="btn second petit" data-semaine="0">Cette semaine</button>' : '')
+      + '<label class="case-a-cocher"><input type="checkbox" data-dimanche' + (A.dimanche ? ' checked' : '') + '> Afficher le dimanche</label>'
+      + '<span class="espace"></span>'
+      + '<button type="button" class="btn second petit" data-imprimer>Exporter en PDF</button>'
+      + (mode === 'planning' ? '<span class="legende"><span class="pastille"></span>heures saisies</span><button type="button" class="btn petit" data-recopier>Recopier la semaine précédente</button>' : '')
+      + '</div>';
+
+    // Titre qui n'apparaît que sur le PDF
+    h += '<div class="titre-impression">Vosges Rénovation — ' + (mode === 'planning' ? 'Planning' : 'Prévu / Réel') + ' — ' + esc(titreSemaine(A.lundi)) + '</div>';
+    if (!salaries.length) {
+      return h + '<div class="message info">Aucun salarié pour l\'instant. Ajoutez-les dans l\'onglet <b>Réglages</b>.</div>';
+    }
+    if (!A.init.chantiers.some(function (c) { return c.actif; })) {
+      h += '<div class="message info">Aucun chantier pour l\'instant. Ajoutez-les dans l\'onglet <b>Réglages</b> avant de planifier.</div>';
+    }
+
+    h += '<div class="grille-cadre"><table class="grille"><thead><tr><th class="col-nom"></th>'
+      + jours.map(function (j) {
+        return '<th class="' + (j === auj ? 'auj' : '') + '">' + esc(jourCourt(j)) + (j === auj ? '<span class="ecran-seul"> · aujourd\'hui</span>' : '')
+          + (mode === 'planning' ? '' : '<div class="sous-th"><span>Prévu</span><span>Réel</span></div>') + '</th>';
+      }).join('')
+      + '<th class="col-total">Semaine</th></tr></thead><tbody>';
+
+    salaries.forEach(function (s) {
+      var totP = 0, totR = 0, totPjusquAuj = 0;
+      h += '<tr><td class="nom' + (s.actif ? '' : ' inactif') + '">' + esc(s.nom) + '</td>';
+      jours.forEach(function (j) {
+        var k = s.id + '|' + j, p = pr[k] || [], r = re[k] || [];
+        var tp = total(p), tr = total(r);
+        totP += tp; totR += tr; if (j < auj || (j === auj && r.length)) totPjusquAuj += tp;
+        var type = mode === 'planning' ? 'prevu' : 'reel';
+        var classes = 'case' + (j === auj ? ' auj' : '') + (j > auj ? ' futur' : '') + (mode === 'planning' ? '' : ' cmp');
+        var marque = marqueEnvoi(type, s.id, j);
+        if (etatEnvoi(type, s.id, j) === 'erreur') classes += ' ecart-neg';
+        var contenu = htmlCaseDouble(p, r, ch);
+        var passe = j <= auj;
+
+        if (mode === 'planning') {
+          var montre = r.length ? r : p;
+          contenu = htmlCaseSimple(montre, ch);
+          if (r.length) classes += ' case-reel';
+          var th = r.length ? tr : tp;
+          if (th) contenu += '<div class="heures-jour">' + hCourt(th) + (r.length ? ' faites' : ' prévues') + '</div>';
+          if (!contenu && !marque) { classes += ' vide-case'; contenu = '+'; }
+          h += '<td><button type="button" class="' + classes + '" data-prevu="' + k + '" aria-label="Planifier ' + esc(s.nom) + ' le ' + esc(jourLong(j)) + '">'
+            + contenu + marque + '</button></td>';
+          return;
+        }
+        // Onglet Prévu / Réel : l'écart du jour en bas de la case
+        var ecart = '';
+        if (r.length) {
+          var ec = tr - tp;
+          if (ec < 0) classes += ' bord-neg'; else if (ec === 0) classes += ' bord-ok';
+          ecart = '<div class="ecart">' + (ec === 0 ? 'Conforme' : fEcart(ec)) + '</div>';
+        } else if (j < auj && tp > 0) {
+          classes += ' bord-neg';
+          ecart = '<div class="ecart">Pas saisi</div>';
+        } else if (j === auj && tp > 0) {
+          ecart = '<div class="note">pas encore saisi</div>';
+        }
+        contenu += ecart + marque;
+        if (!contenu) contenu = passe ? '<span class="vide">—</span>' : '';
+        h += '<td>' + (passe
+          ? '<button type="button" class="' + classes + '" data-reel="' + k + '" aria-label="Corriger le réel de ' + esc(s.nom) + ' le ' + esc(jourLong(j)) + '">' + contenu + '</button>'
+          : '<div class="' + classes + '">' + contenu + '</div>') + '</td>';
+      });
+      if (mode === 'planning') {
+        h += '<td class="total">Prévu <b>' + hCourt(totP) + '</b><br>Fait <b>' + hCourt(totR) + '</b></td>';
+      } else {
+        var ecs = totR - totPjusquAuj;
+        h += '<td class="total">Prévu ' + fh(totP) + '<br>Réel <b>' + fh(totR) + '</b>'
+          + '<br><span class="' + (ecs < 0 ? 'txt-neg' : ecs === 0 ? 'txt-ok' : '') + '">' + (ecs === 0 ? 'conforme' : fEcart(ecs)) + '</span>'
+          + '<div class="note">sur les jours saisis ou passés</div></td>';
+      }
+      h += '</tr>';
+    });
+    return h + '</tbody></table></div>';
+  }
+
+  function htmlReglages() {
+    var sansAdresse = !A.init.adresse;
+    var h = '<div class="reglages">';
+    if (sansAdresse) {
+      h += '<div class="message erreur">L\'adresse de l\'appli n\'est pas renseignée : les liens ne peuvent pas être affichés. Collez-la ci-dessous.</div>';
+    }
+    h += '<div class="panneau"><h3>Salariés</h3><p class="aide">Chaque salarié a son lien personnel : envoyez-le-lui par mail (Copier le lien, puis collez-le dans votre mail). Il ne voit que son planning et ses heures. « Nouveau lien » rend l\'ancien inutilisable (téléphone perdu, départ…).</p>';
+    A.init.salaries.forEach(function (s) {
+      h += '<div class="rang' + (s.actif ? '' : ' inactif') + '">'
+        + '<input type="text" class="nom-in" data-nom="sal|' + s.id + '" value="' + esc(s.nom) + '" aria-label="Nom">'
+        + '<label class="case-a-cocher"><input type="checkbox" data-actif="sal|' + s.id + '"' + (s.actif ? ' checked' : '') + '> actif</label>'
+        + '<button type="button" class="btn second petit" data-maj="sal|' + s.id + '">Enregistrer</button>'
+        + (s.lien ? '<input type="text" class="lien-in" readonly value="' + esc(s.lien) + '" aria-label="Lien"><button type="button" class="btn second petit" data-copier="' + esc(s.lien) + '">Copier le lien</button>' : '')
+        + '<button type="button" class="btn second petit" data-code="salarie|' + s.id + '">Nouveau lien</button></div>';
+    });
+    h += '<div class="rang"><input type="text" class="nom-in" data-nouveau="sal" placeholder="Nom du salarié"><button type="button" class="btn petit" data-ajout="sal">Ajouter le salarié</button></div></div>';
+
+    h += '<div class="panneau"><h3>Chantiers</h3><p class="aide">Un chantier terminé : décochez « actif ». Il disparaît des listes mais son historique reste.</p>';
+    A.init.chantiers.forEach(function (c) {
+      h += '<div class="rang' + (c.actif ? '' : ' inactif') + '">'
+        + '<input type="text" class="nom-in" data-nom="ch|' + c.id + '" value="' + esc(c.nom) + '" aria-label="Nom du chantier">'
+        + '<input type="text" class="adr-in" data-adr="ch|' + c.id + '" value="' + esc(c.adresse) + '" placeholder="Adresse" aria-label="Adresse">'
+        + '<label class="case-a-cocher"><input type="checkbox" data-actif="ch|' + c.id + '"' + (c.actif ? ' checked' : '') + '> actif</label>'
+        + '<button type="button" class="btn second petit" data-maj="ch|' + c.id + '">Enregistrer</button></div>';
+    });
+    h += '<div class="rang"><input type="text" class="nom-in" data-nouveau="ch" placeholder="Nom du chantier"><input type="text" class="adr-in" data-nouveau-adr placeholder="Adresse"><button type="button" class="btn petit" data-ajout="ch">Ajouter le chantier</button></div></div>';
+
+    h += '<div class="panneau"><h3>Responsables</h3><p class="aide">Ceux qui préparent le planning et voient les heures de tout le monde.</p>';
+    A.init.responsables.forEach(function (r) {
+      var moi = r.id === A.init.moi.id;
+      h += '<div class="rang' + (r.actif ? '' : ' inactif') + '">'
+        + '<input type="text" class="nom-in" data-nom="resp|' + r.id + '" value="' + esc(r.nom) + '" aria-label="Nom">'
+        + (moi ? '<span class="note">(vous)</span>' : '<label class="case-a-cocher"><input type="checkbox" data-actif="resp|' + r.id + '"' + (r.actif ? ' checked' : '') + '> actif</label>')
+        + '<button type="button" class="btn second petit" data-maj="resp|' + r.id + '">Enregistrer</button>'
+        + (r.lien ? '<input type="text" class="lien-in" readonly value="' + esc(r.lien) + '" aria-label="Lien"><button type="button" class="btn second petit" data-copier="' + esc(r.lien) + '">Copier le lien</button>' : '')
+        + (moi ? '' : '<button type="button" class="btn second petit" data-code="responsable|' + r.id + '">Nouveau lien</button>')
+        + '</div>';
+    });
+    h += '<div class="rang"><input type="text" class="nom-in" data-nouveau="resp" placeholder="Nom"><button type="button" class="btn petit" data-ajout="resp">Ajouter un responsable</button></div></div>';
+
+    h += '<div class="panneau"><h3>Adresse de la page (site gratuit, sans bandeau bleu)</h3><p class="aide">Quand elle est remplie, les liens des salariés et des responsables pointent vers cette page. Laissez vide pour garder les liens Google.</p>'
+      + '<div class="rang"><input type="text" class="adr-in" data-adresse-page value="' + esc(A.init.page || '') + '" placeholder="https://vosges-renovation.github.io/planning/"><button type="button" class="btn second petit" data-maj-page>Enregistrer</button></div></div>';
+    h += '<div class="panneau"><h3>Adresse de l\'appli</h3><p class="aide">L\'adresse donnée par Google au moment du déploiement (elle finit par /exec). Elle sert à fabriquer les liens.</p>'
+      + '<div class="rang"><input type="text" class="adr-in" data-adresse value="' + esc(A.init.adresse) + '" placeholder="https://script.google.com/macros/s/…/exec"><button type="button" class="btn second petit" data-maj-adresse>Enregistrer</button></div></div>';
+    return h + '</div>';
+  }
+
+  function valeur(sel) { var x = app.querySelector(sel); return x ? x.value : ''; }
+  function coche(sel) { var x = app.querySelector(sel); return x ? x.checked : true; }
+
+  function actionAdmin(promesse, message) {
+    return promesse.then(function (r) {
+      if (r.salaries) A.init = r; else if (r.prevu) fusionner(A.d, r);
+      dessinerAdmin();
+      if (message) toast(typeof message === 'function' ? message(r) : message);
+    }, function (e) { toast(e.message); dessinerAdmin(); });
+  }
+
+  app.addEventListener('change', function (e) {
+    if (CONF.role !== 'responsable') return;
+    if (e.target.hasAttribute('data-dimanche')) { A.dimanche = e.target.checked; dessinerAdmin(); }
+  });
+
+  app.addEventListener('click', function (e) {
+    if (CONF.role !== 'responsable') return;
+    var b = e.target.closest('button');
+    if (!b) return;
+    var ch = chantiersParId();
+
+    if (b.hasAttribute('data-imprimer')) {
+      if (A.onglet === 'planning') { choisirSemaines(); return; }
+      toast('Dans la fenêtre qui s\'ouvre, choisissez « Enregistrer au format PDF ».');
+      setTimeout(function () { window.print(); }, 300);
+      return;
+    }
+    if (b.hasAttribute('data-onglet')) { A.onglet = b.getAttribute('data-onglet'); dessinerAdmin(); chargerMoisSiBesoin(); return; }
+    if (b.hasAttribute('data-mois')) {
+      var nm = Number(b.getAttribute('data-mois'));
+      A.mois = nm === 0 ? A.d.aujourdhui.slice(0, 7) : moisVoisin(A.mois, nm);
+      dessinerAdmin();
+      chargerMoisSiBesoin();
+      return;
+    }
+    if (b.hasAttribute('data-semaine')) {
+      var n = Number(b.getAttribute('data-semaine'));
+      A.lundi = n === 0 ? lundiDe(A.d.aujourdhui) : plusJours(A.lundi, n);
+      naviguer(A.d, A.lundi, 'admin.semaine', redessinerGrille);
+      return;
+    }
+    if (b.hasAttribute('data-recopier')) {
+      b.disabled = true; b.textContent = 'Recopie…';
+      actionAdmin(api('admin.recopier', { lundi: A.lundi }), function (r) {
+        return r.copies + ' journée(s) recopiée(s)' + (r.ignores ? ', ' + r.ignores + ' déjà planifiée(s) laissée(s) telle(s) quelle(s)' : '') + '.';
+      });
+      return;
+    }
+    if (b.hasAttribute('data-prevu') || b.hasAttribute('data-reel')) {
+      var estPrevu = b.hasAttribute('data-prevu');
+      var k = b.getAttribute(estPrevu ? 'data-prevu' : 'data-reel').split('|');
+      var sal = A.init.salaries.filter(function (s) { return s.id === k[0]; })[0];
+      var date = k[1];
+      var existant = parJour(estPrevu ? A.d.prevu : A.d.reel)[k[0] + '|' + date] || [];
+      var depart = existant;
+      if (!estPrevu && !existant.length) {
+        depart = (parJour(A.d.prevu)[k[0] + '|' + date] || []).filter(function (l) { return l.chantier; });
+      }
+      fenetreJour({
+        titre: (estPrevu ? 'Planning de ' : 'Heures réelles de ') + sal.nom, date: date, lignes: depart,
+        chantiers: A.init.chantiers,
+        libelleAbsence: estPrevu ? 'Absent ce jour-là (congé, formation…)' : 'N\'a pas travaillé ce jour-là',
+        joursSupp: estPrevu ? joursAffiches().filter(function (j) { return j !== date; }) : null,
+        autresSalaries: estPrevu ? A.init.salaries.filter(function (x) { return x.actif && x.id !== sal.id; }) : null,
+        peutEffacer: existant.length > 0,
+        enregistrer: function (lignes, coches, autres) {
+          var dates = estPrevu ? [date].concat(coches || []) : [date];
+          var sals = estPrevu ? [sal.id].concat(autres || []) : [sal.id];
+          envoyer({
+            type: estPrevu ? 'prevu' : 'reel', per: A.d, sals: sals, dates: dates, lignes: lignes,
+            action: estPrevu ? 'admin.prevu' : 'admin.reel',
+            donnees: estPrevu ? { salaries: sals, dates: dates, lignes: lignes } : { salarie: sal.id, date: date, lignes: lignes },
+            redessiner: redessinerGrille
+          });
+        }
+      });
+      return;
+    }
+    if (b.hasAttribute('data-copier')) {
+      var lien = b.getAttribute('data-copier');
+      var champ = b.previousElementSibling;
+      var fini = function () { toast('Lien copié : collez-le dans votre mail (Ctrl + V).'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(lien).then(fini, function () { champ.select(); document.execCommand('copy'); fini(); });
+      else { champ.select(); document.execCommand('copy'); fini(); }
+      return;
+    }
+    var TYPES = { sal: 'admin.salarie', ch: 'admin.chantier', resp: 'admin.responsable' };
+    if (b.hasAttribute('data-maj')) {
+      var m = b.getAttribute('data-maj'), t = m.split('|')[0], id = m.split('|')[1];
+      var d = { id: id, nom: valeur('[data-nom="' + m + '"]'), actif: coche('[data-actif="' + m + '"]') };
+      if (t === 'ch') d.adresse = valeur('[data-adr="' + m + '"]');
+      b.disabled = true;
+      actionAdmin(api(TYPES[t], d), 'Enregistré ✓');
+      return;
+    }
+    if (b.hasAttribute('data-ajout')) {
+      var ta = b.getAttribute('data-ajout');
+      var da = { nom: valeur('[data-nouveau="' + ta + '"]') };
+      if (ta === 'ch') da.adresse = valeur('[data-nouveau-adr]');
+      if (!da.nom.trim()) { toast('Indiquez un nom.'); return; }
+      b.disabled = true;
+      actionAdmin(api(TYPES[ta], da), 'Ajouté ✓');
+      return;
+    }
+    if (b.hasAttribute('data-code')) {
+      var c = b.getAttribute('data-code').split('|');
+      if (b.getAttribute('data-confirme') !== '1') {
+        b.setAttribute('data-confirme', '1'); b.textContent = 'Confirmer : l\'ancien lien ne marchera plus';
+        return;
+      }
+      b.disabled = true;
+      actionAdmin(api('admin.nouveauCode', { type: c[0], id: c[1] }), 'Nouveau lien créé : envoyez-le à la personne.');
+      return;
+    }
+    if (b.hasAttribute('data-maj-page')) {
+      b.disabled = true;
+      actionAdmin(api('admin.adressePage', { adresse: valeur('[data-adresse-page]') }), 'Adresse enregistrée : les liens ont changé, pensez à les renvoyer.');
+      return;
+    }
+    if (b.hasAttribute('data-maj-adresse')) {
+      b.disabled = true;
+      actionAdmin(api('admin.adresse', { adresse: valeur('[data-adresse]') }), 'Adresse enregistrée ✓');
+    }
+  });
+
+  // ------------------------------------------------------------------------------------------
+  // Démarrage
+  // ------------------------------------------------------------------------------------------
+  // Un seul appel au démarrage : Google dit qui est là et renvoie ses données
+  if (!CONF.code) erreurPage('Ce lien n\'est pas valable. Demandez votre lien personnel au bureau.');
+  else api('demarrer').then(function (r) {
+    CONF.role = r.role;
+    if (r.role === 'salarie') salarie(r); else responsable(r);
+  }).catch(function (e) { erreurPage(e.message); });
+})();
+</script>
+</body>
+</html>

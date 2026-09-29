@@ -106,7 +106,11 @@
   .ap-case.heures { min-height: 36px; font-weight: 500; font-size: 11px; font-variant-numeric: tabular-nums; }
   .moitie { padding: 2px 0 6px; }
   .moitie.suite { border-top: 1px dashed var(--bord); padding-top: 8px; }
-  /* ---------- Salarié : aujourd'hui, consignes, demi-journées ---------- */
+  /* ---------- Salarié : bonjour, carte cliquable, demi-journées ---------- */
+  .bonjour { font-size: 24px; font-weight: 700; margin: 2px 2px 12px; }
+  .bouton-jour { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 8px; background: none; border: 0; padding: 0 0 8px; margin: 0 0 4px; text-align: left; border-bottom: 1px solid var(--bord); }
+  .jour-droite { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .bouton-jour .voir { font-size: 14px; font-weight: 700; color: var(--rouge); white-space: nowrap; }
   .hero { background: #8E2520; color: #fff; border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; }
   .hero .d { font-size: 13px; opacity: .85; }
   .hero .bj { font-size: 22px; font-weight: 700; margin: 2px 0 8px; }
@@ -791,27 +795,9 @@
     }).join('') + '</div>';
   }
 
-  /** En haut de la page : aujourd'hui en grand, avec les collègues du même chantier, puis les consignes du jour. */
-  function htmlAujourdhui(pr, chantiers) {
-    var auj = S.aujourdhui;
-    var p = pr[S.id + '|' + auj] || [];
-    var liste = chantiersDuJour(p);
-    var absence = p.filter(function (l) { return !l.chantier; })[0];
-    var h = '<div class="hero"><div class="d">' + esc(dateLongue(auj)) + '</div><div class="bj">Bonjour ' + esc(String(S.nom || '').split(' ')[0]) + '</div>';
-    if (liste.length) {
-      h += '<div class="et">' + (liste.length > 1 ? 'Tes chantiers du jour' : 'Ton chantier du jour') + '</div>';
-      liste.forEach(function (x, i) {
-        var c = chantiers[x.id];
-        var col = (S.collegues || {})[auj + '|' + x.id];
-        h += (i ? '<div class="sep"></div>' : '') + '<div class="ch">' + esc(c ? c.nom : x.nom) + '</div>'
-          + '<div class="inf">' + hc(x.debut) + ' – ' + hc(x.fin) + ' · ' + (col && col.length ? 'avec ' + esc(col.join(', ')) : 'seul') + '</div>';
-      });
-    } else if (absence) {
-      h += '<div class="ch">' + esc(absence.remarque || 'Absent') + '</div>';
-    } else {
-      h += '<div class="inf">Rien de prévu aujourd\'hui.</div>';
-    }
-    return h + '</div>' + htmlConsignes(liste, chantiers);
+  /** En haut de la page : seulement le bonjour (le détail du jour s'ouvre en touchant la date). */
+  function htmlBonjour() {
+    return '<div class="bonjour">Bonjour ' + esc(String(S.nom || '').split(' ')[0]) + '</div>';
   }
 
   function passeMidi(l) { return l.chantier && l.debut && min(l.debut) < 12 * 60 && min(l.fin) > 12 * 60; }
@@ -839,7 +825,11 @@
     else if (auj) etiquette = '<span class="etiquette auj">Aujourd\'hui</span>';
     else if (passe && p.some(function (l) { return l.chantier; })) etiquette = '<span class="etiquette manque">Pas saisi</span>';
 
-    var h = '<div class="jour' + (auj ? ' aujourdhui' : '') + '" id="jour-' + date + '"><div class="jour-tete"><span class="jour-nom">' + esc(jourLong(date)) + '</span>' + etiquette + '</div>';
+    var aConsignes = chantiersDuJour(p).some(function (x) { return x.consignes.length; });
+    var h = '<div class="jour' + (auj ? ' aujourdhui' : '') + '" id="jour-' + date + '">'
+      + '<button type="button" class="jour-tete bouton-jour" data-detail="' + date + '" aria-label="Voir le détail du ' + esc(jourLong(date)) + '">'
+      + '<span class="jour-nom">' + esc(jourLong(date)) + '</span>'
+      + '<span class="jour-droite">' + etiquette + '<span class="voir">' + (aConsignes ? 'Consignes' : 'Détail') + ' ›</span></span></button>';
     var moments = [true, false].filter(function (m) { return pourMoment(p, m).length || pourMoment(r, m).length; });
     if (!moments.length && modifiable) moments = [true, false];
     if (!moments.length) h += '<div class="vide">Rien de prévu</div>';
@@ -861,12 +851,6 @@
       }
       h += '</div>';
     });
-    // Consignes des autres jours : seulement à la demande (celles du jour sont en haut de la page)
-    var avecConsignes = chantiersDuJour(p).filter(function (x) { return x.consignes.length; });
-    if (avecConsignes.length && !auj) {
-      h += '<button type="button" class="lien-consignes" data-detail="' + date + '"><span>Consignes<small>'
-        + esc(avecConsignes.map(function (x) { return chantiers[x.id] ? chantiers[x.id].nom : x.nom; }).join(' · ')) + '</small></span><span class="chev">›</span></button>';
-    }
     if (ev === 'erreur') {
       h += '<div class="message erreur" style="margin:10px 0 0">Ces heures ne sont pas arrivées au bureau : ' + esc(ENVOIS['reel|' + S.id + '|' + date].message) + '</div>'
         + '<div class="actions-jour"><button type="button" class="btn plein" data-renvoyer="' + date + '">Réessayer l\'envoi</button></div>';
@@ -880,7 +864,7 @@
   function dessinerSalarie() {
     var chantiers = chantiersS();
     var pr = parJour(S.prevu), re = parJour(S.reel);
-    var h = htmlAujourdhui(pr, chantiers) + htmlCarteJour(S.aujourdhui, pr, re, chantiers);
+    var h = htmlBonjour() + htmlCarteJour(S.aujourdhui, pr, re, chantiers);
     h += '<div class="semaine-nav"><button type="button" class="btn second" data-sem="-7" aria-label="Semaine précédente">◀</button>'
       + '<div class="titre">' + esc(titreSemaine(lundiAffiche)) + '</div>'
       + '<button type="button" class="btn second" data-sem="7" aria-label="Semaine suivante">▶</button></div>';
@@ -895,24 +879,32 @@
     app.innerHTML = h;
   }
 
-  /** Consignes d'un jour, chantier par chantier, et mes commentaires (lecture seule). */
+  /** Détail d'un jour : chaque chantier (horaires, adresse, collègues, consignes), puis mes heures et mes commentaires. */
   function ouvrirDetail(date) {
     var chantiers = chantiersS();
     var p = parJour(S.prevu)[S.id + '|' + date] || [];
     var r = parJour(S.reel)[S.id + '|' + date] || [];
-    var h = '<h2>Consignes</h2><div class="sous">' + esc(dateLongue(date)) + '</div>';
-    chantiersDuJour(p).forEach(function (x) {
+    var h = '<h2>' + esc(dateLongue(date)) + '</h2><div class="sous">Détail de la journée</div>';
+    var liste = chantiersDuJour(p);
+    var absence = p.filter(function (l) { return !l.chantier; })[0];
+    if (!liste.length) h += '<div class="det-chantier"><div class="vide">' + esc(absence ? (absence.remarque || 'Absent') : 'Rien de prévu ce jour-là') + '</div></div>';
+    liste.forEach(function (x) {
       var c = chantiers[x.id];
+      var col = (S.collegues || {})[date + '|' + x.id];
       h += '<div class="det-chantier"><div class="ch">' + esc(c ? c.nom : x.nom) + '</div>'
         + (c && c.adresse ? '<div class="adr">' + esc(c.adresse) + '</div>' : '')
-        + '<div class="h">' + heure(x.debut) + ' → ' + heure(x.fin) + '</div>'
-        + (x.consignes.length ? '<div class="consignes-liste">' + x.consignes.map(function (t) { return '<div class="l">' + esc(t) + '</div>'; }).join('') + '</div>' : '<div class="vide">Pas de consigne</div>')
+        + '<div class="h">Prévu ' + heure(x.debut) + ' → ' + heure(x.fin) + ' · ' + (col && col.length ? 'avec ' + esc(col.join(', ')) : 'seul') + '</div>'
+        + (x.consignes.length
+          ? '<div class="bloc-titre" style="margin-top:8px">Consignes</div><div class="consignes-liste">' + x.consignes.map(function (t) { return '<div class="l">' + esc(t) + '</div>'; }).join('') + '</div>'
+          : '<div class="vide" style="margin-top:6px">Pas de consigne</div>')
         + '</div>';
     });
-    var comms = r.filter(function (l) { return l.chantier && l.remarque; });
-    if (comms.length) {
-      h += '<div class="bloc-titre" style="margin-top:12px">Mes commentaires</div>' + comms.map(function (l) {
-        return '<div class="comm-lecture"><b>' + esc(chantiers[l.chantier] ? chantiers[l.chantier].nom : l.chantierNom) + '</b>' + esc(l.remarque) + '</div>';
+    if (r.length) {
+      h += '<div class="bloc-titre" style="margin-top:12px">Mes heures</div>' + r.slice().sort(function (a, b) { return String(a.debut).localeCompare(String(b.debut)); }).map(function (l) {
+        var nom = l.chantier ? (chantiers[l.chantier] ? chantiers[l.chantier].nom : l.chantierNom) : (l.remarque || 'Absent');
+        return '<div class="comm-lecture"><b>' + esc(nom) + '</b>'
+          + (l.chantier ? heure(l.debut) + ' → ' + heure(l.fin) + (l.pause ? ', pause ' + fh(l.pause) : '') + ' = ' + fh(duree(l)) : '')
+          + (l.chantier && l.remarque ? '<div class="comm">' + esc(l.remarque) + '</div>' : '') + '</div>';
       }).join('');
     }
     h += '<div class="pied"><button type="button" class="btn" data-fermer>Fermer</button></div>';

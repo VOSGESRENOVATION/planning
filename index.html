@@ -106,6 +106,66 @@
   .ap-case.heures { min-height: 36px; font-weight: 500; font-size: 11px; font-variant-numeric: tabular-nums; }
   .moitie { padding: 2px 0 6px; }
   .moitie.suite { border-top: 1px dashed var(--bord); padding-top: 8px; }
+  /* ---------- Salarié : aujourd'hui, consignes, demi-journées ---------- */
+  .hero { background: #8E2520; color: #fff; border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; }
+  .hero .d { font-size: 13px; opacity: .85; }
+  .hero .bj { font-size: 22px; font-weight: 700; margin: 2px 0 8px; }
+  .hero .et { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #FFD2CC; }
+  .hero .ch { font-size: 19px; font-weight: 700; }
+  .hero .inf { font-size: 15px; opacity: .92; }
+  .hero .sep { border-top: 1px solid rgba(255,255,255,.25); margin: 9px 0; }
+  .consignes { background: #fff; border: 1px solid var(--bord); border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; }
+  .bloc-cons + .bloc-cons { border-top: 1px solid var(--bord); margin-top: 9px; padding-top: 9px; }
+  .consignes .ct { font-size: 12px; font-weight: 700; color: var(--rouge); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3px; }
+  .consignes .l, .consignes-liste .l { font-size: 15px; padding: 2px 0 2px 16px; position: relative; }
+  .consignes .l::before, .consignes-liste .l::before { content: '–'; position: absolute; left: 0; color: var(--gris); }
+  .moment-jour + .moment-jour { border-top: 1px solid var(--bord); margin-top: 10px; padding-top: 10px; }
+  .deux-col { display: grid; grid-template-columns: 1fr 1fr; column-gap: 12px; }
+  .deux-col > * { min-width: 0; overflow-wrap: anywhere; }
+  .deux-col .r { border-left: 1px solid var(--bord); padding-left: 12px; }
+  .deux-col .k { font-size: 10px; font-weight: 700; color: var(--gris-clair); text-transform: uppercase; letter-spacing: .05em; }
+  .deux-col .r .k { color: #2F5E8E; }
+  .asaisir { color: var(--gris-clair); font-style: italic; font-size: 14px; }
+  .comm { font-size: 13px; color: var(--gris); white-space: pre-line; margin-top: 2px; }
+  .lien-consignes { display: flex; width: 100%; justify-content: space-between; align-items: center; margin-top: 10px; padding: 10px 12px; border-radius: 10px; border: 1.5px solid var(--bord); background: #fff; text-align: left; font-weight: 700; font-size: 15px; }
+  .lien-consignes small { display: block; font-weight: 500; font-size: 13px; color: var(--gris); }
+  .lien-consignes .chev { font-size: 22px; color: var(--gris); }
+  .rappel { font-size: 14px; color: var(--gris); background: var(--fond-prevu); border-radius: 8px; padding: 7px 10px; margin-bottom: 10px; }
+  .choix-chantier { margin-bottom: 6px; }
+  .choix-chantier .case-a-cocher { padding: 6px 0; }
+  .champ textarea { width: 100%; min-height: 70px; padding: 8px 10px; border: 1.5px solid var(--bord); border-radius: 8px; background: #fff; font: inherit; font-size: 16px; resize: vertical; }
+  .det-chantier { border: 1px solid var(--bord); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; }
+  .det-chantier .ch { font-weight: 700; font-size: 17px; }
+  .det-chantier .adr { color: var(--gris); font-size: 14px; }
+  .consignes-liste { margin-top: 6px; }
+  .comm-lecture { background: var(--fond); border-radius: 8px; padding: 7px 10px; margin-top: 6px; white-space: pre-line; font-size: 14px; }
+  .comm-lecture b { display: block; font-size: 12px; color: var(--gris); }
+  .info-lecture { margin-bottom: 12px; }
+  /* ---------- Responsables : repères, vue téléphone ---------- */
+  .reperes { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .repere { font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 10px; border: 1px solid var(--bord); color: var(--gris); background: #fff; }
+  .repere.com { color: #2F5E8E; border-color: #BCD4EC; }
+  .case.cmp .dbl-c.manque-r { background: #fff; border: 1px dashed #BCD4EC; color: var(--gris-clair); font-style: italic; font-size: 12px; }
+  table.compteur tr.ligne-total td { font-weight: 700; border-top: 2px solid var(--bord); }
+  .jours-chips { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 12px; }
+  .chip { border: 1.5px solid var(--bord); background: #fff; border-radius: 10px; padding: 10px 1px; font-size: 13px; font-weight: 500; min-height: 44px; white-space: nowrap; }
+  .carte-sal .dbl-c.manque-r { background: #fff; border: 1px dashed #BCD4EC; color: var(--gris-clair); font-style: italic; }
+  .chip.auj { border-color: var(--rouge); }
+  .chip.actif { background: var(--rouge); border-color: var(--rouge); color: #fff; font-weight: 700; }
+  .carte-sal { display: block; width: 100%; text-align: left; background: #fff; border: 1.5px solid var(--bord); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; font-size: 14px; }
+  .carte-sal.case-reel { background: var(--fond-reel); border-color: #BCD4EC; }
+  .carte-sal .nom-sal { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+  .carte-sal .ch { font-weight: 700; }
+  .carte-sal .dbl-c { background: var(--fond-prevu); border-radius: 5px; padding: 4px 6px; }
+  .carte-sal .dbl-c.r { background: var(--fond-reel); border-left: 0; }
+  .carte-sal .dbl { column-gap: 6px; padding-bottom: 4px; }
+  @media (max-width: 760px) {
+    main { padding: 12px; }
+    .barre .titre { min-width: 0; flex: 1; font-size: 15px; }
+    .rang .nom-in, .rang .adr-in, .rang .lien-in { width: 100%; min-width: 0; flex: 1 1 100%; }
+    .onglet { padding: 8px 11px; }
+    .legende { display: none; }
+  }
   .cote-a-cote { display: grid; grid-template-columns: 1fr 1fr; column-gap: 12px; margin: 6px 0; }
   .cote-a-cote > * { min-width: 0; overflow-wrap: anywhere; }
   .cote-a-cote .reel { border-left: 1px solid var(--bord); padding-left: 12px; }
@@ -386,7 +446,8 @@
   }
 
   /** Texte d'une journée (prévu ou réel), identique pour le salarié et les responsables. */
-  function htmlLignes(lignes, chantiers, avecAdresse) {
+  /** sansRemarque : pour le prévu, les consignes ne s'affichent pas dans la carte (on les ouvre à part). */
+  function htmlLignes(lignes, chantiers, avecAdresse, sansRemarque) {
     if (!lignes || !lignes.length) return '';
     return lignes.map(function (l) {
       if (!l.chantier) return '<div class="creneau"><span class="ch">' + esc(l.remarque || 'Absent') + '</span></div>';
@@ -397,7 +458,7 @@
         + (avecAdresse && c && c.adresse ? '<div class="adr">' + esc(c.adresse) + '</div>' : '')
         + '<div class="h">' + heure(l.debut) + ' → ' + heure(l.fin) + '</div>'
         + '<div class="h">' + (l.pause ? 'pause ' + fh(l.pause) + ' · ' : '') + '<b>' + fh(duree(l)) + '</b></div>'
-        + (l.remarque ? '<div class="adr">' + esc(l.remarque) + '</div>' : '') + '</div>';
+        + (l.remarque && !sansRemarque ? '<div class="comm">' + esc(l.remarque) + '</div>' : '') + '</div>';
     }).join('');
   }
 
@@ -494,11 +555,12 @@
 
   /** Les mêmes contrôles que Google, faits avant d'envoyer : un refus ne doit pas arriver après coup. */
   function valider(lignes) {
-    var tri = lignes.filter(function (l) { return l.chantier; }).slice().sort(function (a, b) { return min(a.debut) - min(b.debut); });
+    // Créneaux de chantier et absences d'une demi-journée (qui ont des heures) ne doivent pas se chevaucher
+    var tri = lignes.filter(function (l) { return l.debut; }).slice().sort(function (a, b) { return min(a.debut) - min(b.debut); });
     for (var i = 0; i < tri.length; i++) {
       var dur = min(tri[i].fin) - min(tri[i].debut);
       if (dur <= 0) return 'L\'heure de fin doit être après l\'heure de début.';
-      if ((Number(tri[i].pause) || 0) >= dur) return 'La pause est plus longue que le créneau.';
+      if (tri[i].chantier && (Number(tri[i].pause) || 0) >= dur) return 'La pause est plus longue que le créneau.';
       if (i && min(tri[i].debut) < min(tri[i - 1].fin)) return 'Deux créneaux se chevauchent : ' + tri[i - 1].debut + '–' + tri[i - 1].fin + ' et ' + tri[i].debut + '–' + tri[i].fin + '.';
     }
     return '';
@@ -508,8 +570,10 @@
   // Fenêtre de saisie d'une journée (salarié et responsables)
   // ------------------------------------------------------------------------------------------
   /**
-   * o = { titre, date, lignes, chantiers (liste), libelleAbsence, joursSupp (dates proposées),
-   *       peutEffacer, enregistrer(lignes, joursCoches) -> Promise }
+   * o = { titre, date, lignes, chantiers (liste), libelleAbsence, joursSupp (dates proposées), autresSalaries,
+   *       peutEffacer, enregistrer(lignes, joursCoches, salariesCoches),
+   *       et pour la saisie du salarié par demi-journée : ligneDefaut, chantierPrevu, absenceHoraire,
+   *       infoHaut (texte déjà mis en page), libelleRemarque, libelleOk, libelleEffacer, verifier(lignes) }
    */
   function fenetreJour(o) {
     var actifs = o.chantiers.filter(function (c) { return c.actif; });
@@ -519,9 +583,12 @@
     if (absent || !lignes.length) lignes = [ligneVide(null)];
 
     function ligneVide(avant) {
+      if (o.ligneDefaut) return avant ? { chantier: '', debut: '', fin: '', pause: 0, remarque: '' } : Object.assign({}, o.ligneDefaut);
       return avant ? { chantier: '', debut: avant.fin, fin: '', pause: 0, remarque: '' }
         : { chantier: '', debut: '08:00', fin: '17:00', pause: 60, remarque: '' };
     }
+    var nomPrevu = '';
+    if (o.chantierPrevu) o.chantiers.forEach(function (c) { if (c.id === o.chantierPrevu) nomPrevu = c.nom; });
 
     var voile = el('<div class="voile"></div>');
     var f = el('<div class="fenetre"></div>');
@@ -546,14 +613,21 @@
     }
 
     function dessiner(message) {
-      var h = '<h2>' + esc(o.titre) + '</h2><div class="sous">' + esc(jourLong(o.date)) + '</div>';
+      var h = '<h2>' + esc(o.titre) + '</h2><div class="sous">' + esc(jourLong(o.date)) + '</div>' + (o.infoHaut || '');
       h += '<label class="case-a-cocher"><input type="checkbox" data-absent' + (absent ? ' checked' : '') + '> ' + esc(o.libelleAbsence) + '</label>';
       if (absent) {
         h += '<label class="champ"><span>Motif</span><input type="text" data-motif maxlength="120" placeholder="Congé, maladie, formation…" value="' + esc(motif) + '"></label>';
       } else {
         lignes.forEach(function (l, i) {
           h += '<div class="ligne-saisie" data-i="' + i + '">'
-            + '<label class="champ"><span>Chantier' + (lignes.length > 1 ? ' ' + (i + 1) : '') + '</span><select data-k="chantier">' + optionsChantier(l.chantier) + '</select></label>'
+            + (o.chantierPrevu && i === 0
+              // Salarié : « chantier prévu » ou « autre chantier », la liste n'apparaît que pour un autre chantier
+              ? '<div class="choix-chantier">'
+                + '<label class="case-a-cocher"><input type="radio" name="choix' + i + '" data-choix="prevu" data-ligne="' + i + '"' + (l.chantier === o.chantierPrevu && !l.autre ? ' checked' : '') + '> Chantier prévu : <b>' + esc(nomPrevu) + '</b></label>'
+                + '<label class="case-a-cocher"><input type="radio" name="choix' + i + '" data-choix="autre" data-ligne="' + i + '"' + (l.chantier === o.chantierPrevu && !l.autre ? '' : ' checked') + '> J\'ai travaillé sur un autre chantier</label>'
+                + (l.chantier === o.chantierPrevu && !l.autre ? '' : '<label class="champ"><span>Chantier</span><select data-k="chantier">' + optionsChantier(l.chantier === o.chantierPrevu ? '' : l.chantier) + '</select></label>')
+                + '</div>'
+              : '<label class="champ"><span>Chantier' + (lignes.length > 1 ? ' ' + (i + 1) : '') + '</span><select data-k="chantier">' + optionsChantier(l.chantier) + '</select></label>')
             + '<div class="trio">'
             + '<label class="champ"><span>Début</span><input type="text" inputmode="numeric" autocomplete="off" maxlength="5" placeholder="--:--" data-k="debut" data-heure value="' + esc(l.debut) + '"></label>'
             + '<label class="champ"><span>Fin</span><input type="text" inputmode="numeric" autocomplete="off" maxlength="5" placeholder="--:--" data-k="fin" data-heure value="' + esc(l.fin) + '"></label>'
@@ -561,11 +635,11 @@
             + '</div>'
             + '<div class="aide-heure">Tapez l\'heure au clavier : 0830 ou 830 pour 8h30, 17 pour 17h00.</div>'
             + '<div class="duree" data-duree></div>'
-            + '<label class="champ" style="margin-top:10px"><span>Remarque (facultatif)</span><input type="text" data-k="remarque" maxlength="300" value="' + esc(l.remarque) + '"></label>'
+            + '<label class="champ" style="margin-top:10px"><span>' + esc(o.libelleRemarque || 'Remarque (facultatif)') + '</span><textarea data-k="remarque" rows="3" maxlength="2000">' + esc(l.remarque) + '</textarea></label>'
             + (lignes.length > 1 ? '<button type="button" class="lien-btn" data-retirer="' + i + '">Retirer ce chantier</button>' : '')
             + '</div>';
         });
-        h += '<button type="button" class="btn second plein" data-ajouter>+ Un autre chantier ce jour-là</button>';
+        h += '<button type="button" class="btn second plein" data-ajouter>' + (o.ligneDefaut ? '+ Un autre créneau' : '+ Un autre chantier ce jour-là') + '</button>';
       }
       if (o.joursSupp && o.joursSupp.length) {
         h += '<div class="bloc" style="margin-top:14px"><div class="bloc-titre">Appliquer aussi à</div><div class="jours-supp">'
@@ -578,8 +652,8 @@
           + '</div></div>';
       }
       if (message) h += '<div class="erreur-saisie">' + esc(message) + '</div>';
-      h += '<div class="pied"><button type="button" class="btn second" data-annuler>Annuler</button><button type="button" class="btn" data-ok>Enregistrer</button></div>';
-      if (o.peutEffacer) h += '<div style="text-align:center;margin-top:6px"><button type="button" class="lien-btn" data-effacer>Effacer cette journée</button></div>';
+      h += '<div class="pied"><button type="button" class="btn second" data-annuler>Annuler</button><button type="button" class="btn" data-ok>' + esc(o.libelleOk || 'Enregistrer') + '</button></div>';
+      if (o.peutEffacer) h += '<div style="text-align:center;margin-top:6px"><button type="button" class="lien-btn" data-effacer>' + esc(o.libelleEffacer || 'Effacer cette journée') + '</button></div>';
       f.innerHTML = h;
       majDurees();
     }
@@ -621,6 +695,14 @@
     });
     f.addEventListener('change', function (e) {
       if (e.target.hasAttribute('data-absent')) { lireChamps(); absent = e.target.checked; dessiner(); return; }
+      if (e.target.hasAttribute('data-choix')) {
+        lireChamps();
+        var lc = lignes[Number(e.target.getAttribute('data-ligne'))];
+        if (e.target.getAttribute('data-choix') === 'prevu') { lc.chantier = o.chantierPrevu; lc.autre = false; }
+        else { lc.chantier = ''; lc.autre = true; }
+        dessiner();
+        return;
+      }
       lireChamps(); majDurees();
     });
     f.addEventListener('click', function (e) {
@@ -633,7 +715,10 @@
       if (b.hasAttribute('data-ok')) {
         lireChamps();
         var a_envoyer;
-        if (absent) a_envoyer = [{ chantier: '', remarque: motif.trim() || 'Absent' }];
+        if (absent) {
+          a_envoyer = [{ chantier: '', remarque: motif.trim() || 'Absent' }];
+          if (o.absenceHoraire) { a_envoyer[0].debut = o.absenceHoraire.debut; a_envoyer[0].fin = o.absenceHoraire.fin; }
+        }
         else {
           if (lignes.some(function (l) { return !l.chantier; })) { dessiner('Choisissez le chantier.'); return; }
           if (lignes.some(function (l) { return !l.debut || !l.fin; })) { dessiner('Indiquez l\'heure de début et de fin.'); return; }
@@ -644,6 +729,7 @@
           var probleme = valider(a_envoyer);
           if (probleme) { dessiner(probleme); return; }
         }
+        if (o.verifier) { var pb = o.verifier(a_envoyer); if (pb) { dessiner(pb); return; } }
         validerEtFermer(a_envoyer);
       }
     });
@@ -676,67 +762,212 @@
     dessinerSalarie();
   }
 
+  var MOIS_LONGS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+  function dateLongue(s) { var x = d(s); return maj(JOURS[x.getUTCDay()]) + ' ' + x.getUTCDate() + ' ' + MOIS_LONGS[x.getUTCMonth()]; }
+  function chantiersS() { var m = {}; S.chantiers.forEach(function (c) { m[c.id] = c; }); return m; }
+
+  /** Les chantiers d'une journée dans l'ordre : de la première heure à la dernière, et leurs consignes (une par ligne). */
+  function chantiersDuJour(lignes) {
+    var res = [], parId = {};
+    lignes.filter(function (l) { return l.chantier; })
+      .sort(function (a, b) { return min(a.debut) - min(b.debut); })
+      .forEach(function (l) {
+        var x = parId[l.chantier];
+        if (!x) { x = parId[l.chantier] = { id: l.chantier, nom: l.chantierNom, debut: l.debut, fin: l.fin, consignes: [] }; res.push(x); }
+        if (min(l.debut) < min(x.debut)) x.debut = l.debut;
+        if (min(l.fin) > min(x.fin)) x.fin = l.fin;
+        String(l.remarque || '').split('\n').forEach(function (c) { c = c.trim(); if (c && x.consignes.indexOf(c) < 0) x.consignes.push(c); });
+      });
+    return res;
+  }
+
+  function htmlConsignes(liste, chantiers) {
+    var blocs = liste.filter(function (x) { return x.consignes.length; });
+    if (!blocs.length) return '';
+    return '<div class="consignes">' + blocs.map(function (x) {
+      var c = chantiers[x.id];
+      return '<div class="bloc-cons"><div class="ct">Consignes — ' + esc(c ? c.nom : x.nom) + '</div>'
+        + x.consignes.map(function (t) { return '<div class="l">' + esc(t) + '</div>'; }).join('') + '</div>';
+    }).join('') + '</div>';
+  }
+
+  /** En haut de la page : aujourd'hui en grand, avec les collègues du même chantier, puis les consignes du jour. */
+  function htmlAujourdhui(pr, chantiers) {
+    var auj = S.aujourdhui;
+    var p = pr[S.id + '|' + auj] || [];
+    var liste = chantiersDuJour(p);
+    var absence = p.filter(function (l) { return !l.chantier; })[0];
+    var h = '<div class="hero"><div class="d">' + esc(dateLongue(auj)) + '</div><div class="bj">Bonjour ' + esc(String(S.nom || '').split(' ')[0]) + '</div>';
+    if (liste.length) {
+      h += '<div class="et">' + (liste.length > 1 ? 'Tes chantiers du jour' : 'Ton chantier du jour') + '</div>';
+      liste.forEach(function (x, i) {
+        var c = chantiers[x.id];
+        var col = (S.collegues || {})[auj + '|' + x.id];
+        h += (i ? '<div class="sep"></div>' : '') + '<div class="ch">' + esc(c ? c.nom : x.nom) + '</div>'
+          + '<div class="inf">' + hc(x.debut) + ' – ' + hc(x.fin) + ' · ' + (col && col.length ? 'avec ' + esc(col.join(', ')) : 'seul') + '</div>';
+      });
+    } else if (absence) {
+      h += '<div class="ch">' + esc(absence.remarque || 'Absent') + '</div>';
+    } else {
+      h += '<div class="inf">Rien de prévu aujourd\'hui.</div>';
+    }
+    return h + '</div>' + htmlConsignes(liste, chantiers);
+  }
+
+  function passeMidi(l) { return l.chantier && l.debut && min(l.debut) < 12 * 60 && min(l.fin) > 12 * 60; }
+
+  /** La carte d'une journée : matin et après-midi, prévu à gauche, mes heures à droite, un bouton par demi-journée. */
+  function htmlCarteJour(date, pr, re, chantiers) {
+    var p = pr[S.id + '|' + date] || [], r = re[S.id + '|' + date] || [];
+    var auj = date === S.aujourdhui;
+    var passe = date <= S.aujourdhui;
+    var modifiable = passe && date >= S.limite;
+    var ev = etatEnvoi('reel', S.id, date);
+    var attendus = [true, false].filter(function (m) { return pourMoment(p, m).some(function (l) { return l.chantier; }); });
+    var saisi = function (m) { return pourMoment(r, m).length > 0; };
+    var complet = attendus.length ? attendus.every(saisi) : r.length > 0;
+    var faits = attendus.filter(saisi);
+
+    var etiquette = '';
+    if (ev === 'envoi') etiquette = '<span class="etiquette attente">Envoi…</span>';
+    else if (ev === 'erreur') etiquette = '<span class="etiquette manque">Non enregistré</span>';
+    else if (r.length && complet) etiquette = '<span class="etiquette ok">Saisi</span>';
+    else if (faits.length) {
+      etiquette = '<span class="etiquette ' + (auj ? 'attente' : 'manque') + '">' + (faits[0] ? 'Matin saisi · après-midi ' : 'Après-midi saisi · matin ')
+        + (auj ? 'à saisir' : 'manquant') + '</span>';
+    }
+    else if (auj) etiquette = '<span class="etiquette auj">Aujourd\'hui</span>';
+    else if (passe && p.some(function (l) { return l.chantier; })) etiquette = '<span class="etiquette manque">Pas saisi</span>';
+
+    var h = '<div class="jour' + (auj ? ' aujourdhui' : '') + '" id="jour-' + date + '"><div class="jour-tete"><span class="jour-nom">' + esc(jourLong(date)) + '</span>' + etiquette + '</div>';
+    var moments = [true, false].filter(function (m) { return pourMoment(p, m).length || pourMoment(r, m).length; });
+    if (!moments.length && modifiable) moments = [true, false];
+    if (!moments.length) h += '<div class="vide">Rien de prévu</div>';
+    moments.forEach(function (m) {
+      var gp = pourMoment(p, m), gr = pourMoment(r, m);
+      h += '<div class="moment-jour"><div class="bloc-titre">' + (m ? 'Matin' : 'Après-midi') + '</div>';
+      var colP = gp.length ? htmlLignes(gp, chantiers, true, true) : '<div class="vide">Rien de prévu</div>';
+      if (passe) {
+        var attenduIci = gp.some(function (l) { return l.chantier; }) || !p.length;
+        var colR = gr.length ? htmlLignes(gr, chantiers, false) : '<div class="asaisir">' + (modifiable && attenduIci ? 'à saisir' : '—') + '</div>';
+        h += '<div class="deux-col"><div><div class="k">Prévu</div>' + colP + '</div><div class="r"><div class="k">Mes heures</div>' + colR + '</div></div>';
+      } else {
+        h += colP;
+      }
+      if (modifiable) {
+        var nomM = m ? 'le matin' : 'l\'après-midi';
+        h += '<div class="actions-jour"><button type="button" class="btn ' + (gr.length ? 'second ' : '') + 'plein" data-moment="' + date + '|' + (m ? 'm' : 'a') + '">'
+          + (gr.length ? 'Corriger ' : 'Saisir ') + nomM + '</button></div>';
+      }
+      h += '</div>';
+    });
+    // Consignes des autres jours : seulement à la demande (celles du jour sont en haut de la page)
+    var avecConsignes = chantiersDuJour(p).filter(function (x) { return x.consignes.length; });
+    if (avecConsignes.length && !auj) {
+      h += '<button type="button" class="lien-consignes" data-detail="' + date + '"><span>Consignes<small>'
+        + esc(avecConsignes.map(function (x) { return chantiers[x.id] ? chantiers[x.id].nom : x.nom; }).join(' · ')) + '</small></span><span class="chev">›</span></button>';
+    }
+    if (ev === 'erreur') {
+      h += '<div class="message erreur" style="margin:10px 0 0">Ces heures ne sont pas arrivées au bureau : ' + esc(ENVOIS['reel|' + S.id + '|' + date].message) + '</div>'
+        + '<div class="actions-jour"><button type="button" class="btn plein" data-renvoyer="' + date + '">Réessayer l\'envoi</button></div>';
+    }
+    if (passe && !modifiable && !complet && p.some(function (l) { return l.chantier; })) {
+      h += '<div class="verrou">Jour trop ancien pour être saisi ici : voyez avec le bureau.</div>';
+    }
+    return h + '</div>';
+  }
+
   function dessinerSalarie() {
-    var chantiers = {};
-    S.chantiers.forEach(function (c) { chantiers[c.id] = c; });
+    var chantiers = chantiersS();
     var pr = parJour(S.prevu), re = parJour(S.reel);
-    var h = '<div class="semaine-nav"><button type="button" class="btn second" data-sem="-7" aria-label="Semaine précédente">◀</button>'
+    var h = htmlAujourdhui(pr, chantiers) + htmlCarteJour(S.aujourdhui, pr, re, chantiers);
+    h += '<div class="semaine-nav"><button type="button" class="btn second" data-sem="-7" aria-label="Semaine précédente">◀</button>'
       + '<div class="titre">' + esc(titreSemaine(lundiAffiche)) + '</div>'
       + '<button type="button" class="btn second" data-sem="7" aria-label="Semaine suivante">▶</button></div>';
     if (lundiAffiche !== lundiDe(S.aujourdhui)) h += '<div style="text-align:center;margin:-6px 0 12px"><button type="button" class="lien-btn" data-sem="0">Revenir à cette semaine</button></div>';
     h += htmlApercu(pr, chantiers);
-
     for (var i = 0; i < 7; i++) {
       var date = plusJours(lundiAffiche, i);
-      var cle = S.id + '|' + date;
-      var p = pr[cle] || [], r = re[cle] || [];
-      if (i === 6 && !p.length && !r.length) continue;
-      var modifiable = date <= S.aujourdhui && date >= S.limite;
-      var auj = date === S.aujourdhui;
-      var ev = etatEnvoi('reel', S.id, date);
-      var etiquette = ev === 'envoi' ? '<span class="etiquette attente">Envoi…</span>'
-        : ev === 'erreur' ? '<span class="etiquette manque">Non enregistré</span>'
-          : auj ? '<span class="etiquette auj">Aujourd\'hui</span>'
-            : r.length ? '<span class="etiquette ok">Saisi</span>'
-              : (p.length && date < S.aujourdhui && p[0].chantier) ? '<span class="etiquette manque">Pas saisi</span>' : '';
-      h += '<div class="jour' + (auj ? ' aujourdhui' : '') + '" id="jour-' + date + '"><div class="jour-tete"><span class="jour-nom">' + esc(jourLong(date)) + '</span>' + etiquette + '</div>';
-      var prevuCoupe = '';
-      [true, false].forEach(function (m) {
-        var g = pourMoment(p, m);
-        if (g.length) prevuCoupe += '<div class="moitie' + (prevuCoupe ? ' suite' : '') + '">' + htmlLignes(g, chantiers, true) + '</div>';
-      });
-      var blocPrevu = '<div class="bloc"><div class="bloc-titre">Prévu</div>' + (prevuCoupe || '<div class="vide">Rien de prévu</div>') + '</div>';
-      if (r.length) {
-        // Le matin en face du matin, l'après-midi en face de l'après-midi ; un créneau qui
-        // commence avant 12h et finit après 12h apparaît aux deux
-        h += '<div class="cote-a-cote"><div class="bloc-titre">Prévu</div><div class="bloc-titre reel">Mes heures</div>';
-        [true, false].forEach(function (estMatin) {
-          var gp = pourMoment(p, estMatin);
-          var gr = pourMoment(r, estMatin);
-          if (!gp.length && !gr.length) return;
-          h += '<div class="demi' + (estMatin ? '' : ' suite') + '">' + (gp.length ? htmlLignes(gp, chantiers, true) : '<div class="vide">—</div>') + '</div>'
-            + '<div class="demi reel' + (estMatin ? '' : ' suite') + '">' + (gr.length ? htmlLignes(gr, chantiers, false) : '<div class="vide">—</div>') + '</div>';
-        });
-        h += '</div>';
-      } else {
-        h += blocPrevu;
-      }
-      if (ev === 'erreur') {
-        h += '<div class="message erreur" style="margin:10px 0 0">Ces heures ne sont pas arrivées au bureau : ' + esc(ENVOIS['reel|' + S.id + '|' + date].message) + '</div>'
-          + '<div class="actions-jour"><button type="button" class="btn plein" data-renvoyer="' + date + '">Réessayer l\'envoi</button></div>';
-      }
-      if (modifiable) {
-        h += '<div class="actions-jour">';
-        if (!r.length && p.length) h += '<button type="button" class="btn plein" data-comme="' + date + '">J\'ai fait comme prévu</button>';
-        h += '<button type="button" class="btn ' + (!r.length && p.length ? 'second ' : '') + 'plein" data-saisir="' + date + '">'
-          + (r.length ? 'Corriger mes heures' : p.length ? 'Autres heures ou autre chantier' : 'Saisir mes heures') + '</button></div>';
-      } else if (date < S.limite && !r.length && p.length) {
-        h += '<div class="verrou">Jour trop ancien pour être saisi ici : voyez avec le bureau.</div>';
-      }
-      h += '</div>';
+      if (date === S.aujourdhui) continue; // déjà en haut de la page
+      if (i === 6 && !pr[S.id + '|' + date] && !re[S.id + '|' + date]) continue;
+      h += htmlCarteJour(date, pr, re, chantiers);
     }
     app.innerHTML = h;
   }
+
+  /** Consignes d'un jour, chantier par chantier, et mes commentaires (lecture seule). */
+  function ouvrirDetail(date) {
+    var chantiers = chantiersS();
+    var p = parJour(S.prevu)[S.id + '|' + date] || [];
+    var r = parJour(S.reel)[S.id + '|' + date] || [];
+    var h = '<h2>Consignes</h2><div class="sous">' + esc(dateLongue(date)) + '</div>';
+    chantiersDuJour(p).forEach(function (x) {
+      var c = chantiers[x.id];
+      h += '<div class="det-chantier"><div class="ch">' + esc(c ? c.nom : x.nom) + '</div>'
+        + (c && c.adresse ? '<div class="adr">' + esc(c.adresse) + '</div>' : '')
+        + '<div class="h">' + heure(x.debut) + ' → ' + heure(x.fin) + '</div>'
+        + (x.consignes.length ? '<div class="consignes-liste">' + x.consignes.map(function (t) { return '<div class="l">' + esc(t) + '</div>'; }).join('') + '</div>' : '<div class="vide">Pas de consigne</div>')
+        + '</div>';
+    });
+    var comms = r.filter(function (l) { return l.chantier && l.remarque; });
+    if (comms.length) {
+      h += '<div class="bloc-titre" style="margin-top:12px">Mes commentaires</div>' + comms.map(function (l) {
+        return '<div class="comm-lecture"><b>' + esc(chantiers[l.chantier] ? chantiers[l.chantier].nom : l.chantierNom) + '</b>' + esc(l.remarque) + '</div>';
+      }).join('');
+    }
+    h += '<div class="pied"><button type="button" class="btn" data-fermer>Fermer</button></div>';
+    var voile = el('<div class="voile"></div>');
+    var f = el('<div class="fenetre"></div>');
+    f.innerHTML = h;
+    voile.appendChild(f);
+    document.body.appendChild(voile);
+    document.body.style.overflow = 'hidden';
+    f.addEventListener('click', function (e) {
+      var b = e.target.closest('button');
+      if (b && b.hasAttribute('data-fermer')) { voile.remove(); document.body.style.overflow = ''; }
+    });
+  }
+
+  /** Saisie d'une demi-journée : heures vides à taper, prévu rappelé au-dessus, l'autre demi-journée n'est pas touchée. */
+  function saisirMoment(date, matin) {
+    var p = parJour(S.prevu)[S.id + '|' + date] || [];
+    var r = parJour(S.reel)[S.id + '|' + date] || [];
+    if (r.some(passeMidi)) { saisirJournee(date); return; } // saisie ancienne d'un seul bloc : on la corrige en entier
+    var dansCeMoment = function (l) { return !l.debut || (min(l.debut) < 12 * 60) === matin; };
+    var ceMoment = r.filter(dansCeMoment);
+    var autres = r.filter(function (l) { return !dansCeMoment(l); });
+    var chantiers = chantiersS();
+    var gp = pourMoment(p, matin).filter(function (l) { return l.chantier; });
+    var rappel = gp.length
+      ? 'Prévu : ' + gp.map(function (l) { return (chantiers[l.chantier] ? chantiers[l.chantier].nom : l.chantierNom) + ', ' + heure(l.debut) + ' → ' + heure(l.fin); }).join(' puis ')
+      : 'Rien de prévu ' + (matin ? 'ce matin' : 'cet après-midi') + '.';
+    var chantierPrevu = gp.length ? gp[0].chantier : '';
+    fenetreJour({
+      titre: matin ? 'Matin' : 'Après-midi', date: date, lignes: ceMoment,
+      chantiers: S.chantiers, chantierPrevu: chantierPrevu,
+      ligneDefaut: { chantier: chantierPrevu, debut: '', fin: '', pause: 0, remarque: '' },
+      infoHaut: '<div class="rappel">' + esc(rappel) + '</div>',
+      libelleAbsence: matin ? 'Je n\'ai pas travaillé ce matin' : 'Je n\'ai pas travaillé cet après-midi',
+      absenceHoraire: matin ? { debut: '00:00', fin: '12:00' } : { debut: '12:00', fin: '23:59' },
+      libelleRemarque: 'Commentaire pour le bureau (facultatif)',
+      libelleOk: matin ? 'Enregistrer le matin' : 'Enregistrer l\'après-midi',
+      peutEffacer: ceMoment.length > 0, libelleEffacer: 'Effacer ' + (matin ? 'le matin' : 'l\'après-midi'),
+      verifier: function (lignes) { return valider(autres.concat(lignes)); },
+      enregistrer: function (lignes) { enregistrerSalarie(date, autres.concat(lignes)); }
+    });
+  }
+
+  /** Correction de toute la journée d'un coup (ancienne saisie d'un seul bloc 8h–17h). */
+  function saisirJournee(jour) {
+    var reel = parJour(S.reel)[S.id + '|' + jour] || [];
+    fenetreJour({
+      titre: 'Corriger mes heures', date: jour, lignes: reel,
+      chantiers: S.chantiers, libelleAbsence: 'Je n\'ai pas travaillé ce jour-là', peutEffacer: reel.length > 0,
+      libelleRemarque: 'Commentaire pour le bureau (facultatif)',
+      enregistrer: function (lignes) { enregistrerSalarie(jour, lignes); }
+    });
+  }
+
   function lundiDe(s) { var j = d(s).getUTCDay(); return plusJours(s, j === 0 ? -6 : 1 - j); }
 
   /**
@@ -802,23 +1033,12 @@
       enregistrerSalarie(jr, ENVOIS['reel|' + S.id + '|' + jr].lignes);
       return;
     }
-    if (b.hasAttribute('data-comme')) {
-      var date = b.getAttribute('data-comme');
-      var p = parJour(S.prevu)[S.id + '|' + date] || [];
-      enregistrerSalarie(date, p.map(function (l) { return { chantier: l.chantier, debut: l.debut, fin: l.fin, pause: l.pause, remarque: l.chantier ? '' : l.remarque }; }));
+    if (b.hasAttribute('data-moment')) {
+      var x = b.getAttribute('data-moment').split('|');
+      saisirMoment(x[0], x[1] === 'm');
       return;
     }
-    if (b.hasAttribute('data-saisir')) {
-      var jour = b.getAttribute('data-saisir');
-      var reel = parJour(S.reel)[S.id + '|' + jour] || [];
-      var prevu = parJour(S.prevu)[S.id + '|' + jour] || [];
-      var depart = reel.length ? reel : prevu.filter(function (l) { return l.chantier; }).map(function (l) { return Object.assign({}, l, { remarque: '' }); });
-      fenetreJour({
-        titre: reel.length ? 'Corriger mes heures' : 'Mes heures', date: jour, lignes: depart,
-        chantiers: S.chantiers, libelleAbsence: 'Je n\'ai pas travaillé ce jour-là', peutEffacer: reel.length > 0,
-        enregistrer: function (lignes) { enregistrerSalarie(jour, lignes); }
-      });
-    }
+    if (b.hasAttribute('data-detail')) { ouvrirDetail(b.getAttribute('data-detail')); return; }
   });
 
   // ------------------------------------------------------------------------------------------
@@ -841,6 +1061,11 @@
 
   // Un envoi qui se termine ne redessine pas l'onglet Réglages : on y perdrait ce qui est en cours de frappe
   function redessinerGrille() { if (A.onglet !== 'reglages') dessinerAdmin(); }
+  if (window.matchMedia) {
+    var mq = window.matchMedia('(max-width: 760px)');
+    var auChangement = function () { if (CONF.role === 'responsable' && A.init) redessinerGrille(); };
+    if (mq.addEventListener) mq.addEventListener('change', auChangement); else if (mq.addListener) mq.addListener(auChangement);
+  }
 
   // ------------------------------------------------------------------------------------------
   // Export du planning sur plusieurs semaines, en A4 portrait
@@ -897,10 +1122,9 @@
         jours.forEach(function (j) {
           var p = pr[s.id + '|' + j] || [], r = re[s.id + '|' + j] || [];
           totP += total(p); totR += total(r);
-          var montre = r.length ? r : p;
-          var t = r.length ? total(r) : total(p);
-          h += '<td class="' + (r.length ? 'r' : '') + '">' + htmlCaseSimple(montre, ch)
-            + (t ? '<div class="hj">' + hCourt(t) + (r.length ? ' faites' : ' prévues') + '</div>' : '') + '</td>';
+          var hj = heuresPlanning(p, r);
+          h += '<td class="' + (r.length ? 'r' : '') + '">' + htmlCasePlanning(p, r, ch)
+            + (hj ? '<div class="hj">' + hj + '</div>' : '') + '</td>';
         });
         h += '<td class="t">Prévu ' + hCourt(totP) + '<br>Fait ' + hCourt(totR) + '</td></tr>';
       });
@@ -947,11 +1171,12 @@
 
   function dessinerAdmin() {
     var h = '<div class="onglets">'
-      + [['planning', 'Planning'], ['reel', 'Prévu / Réel'], ['compteur', 'Compteur'], ['reglages', 'Réglages']].map(function (o) {
+      + [['planning', 'Planning'], ['reel', 'Prévu / Réel'], ['chantiers', 'Chantiers'], ['compteur', 'Compteur'], ['reglages', 'Réglages']].map(function (o) {
         return '<button type="button" class="onglet' + (A.onglet === o[0] ? ' actif' : '') + '" data-onglet="' + o[0] + '">' + o[1] + '</button>';
       }).join('') + '</div>';
     if (A.onglet === 'reglages') h += htmlReglages();
     else if (A.onglet === 'compteur') h += htmlCompteur();
+    else if (A.onglet === 'chantiers') h += htmlChantiers();
     else h += htmlGrille(A.onglet);
     app.innerHTML = h;
   }
@@ -1015,6 +1240,79 @@
       + '<p class="aide-compteur">Heures réellement saisies (pauses déduites). Une semaine à cheval sur deux mois ne compte ici que ses jours du mois.</p>';
   }
 
+  /** Heures faites (réel saisi) sur chaque chantier pendant la semaine affichée, salarié par salarié. */
+  function htmlChantiers() {
+    var ch = chantiersParId();
+    var du = A.lundi, au = plusJours(A.lundi, 6);
+    var h = '<div class="barre">'
+      + '<button type="button" class="btn second petit" data-semaine="-7" aria-label="Semaine précédente">◀</button>'
+      + '<span class="titre">' + esc(titreSemaine(A.lundi)) + '</span>'
+      + '<button type="button" class="btn second petit" data-semaine="7" aria-label="Semaine suivante">▶</button>'
+      + (A.lundi !== lundiDe(A.d.aujourdhui) ? '<button type="button" class="btn second petit" data-semaine="0">Cette semaine</button>' : '')
+      + '<span class="espace"></span>'
+      + '<button type="button" class="btn second petit" data-imprimer>Exporter en PDF</button></div>'
+      + '<div class="titre-impression">Vosges Rénovation — Heures par chantier — ' + esc(titreSemaine(A.lundi)) + '</div>';
+    var t = {}, salIds = {}, chIds = {};
+    A.d.reel.forEach(function (l) {
+      if (!l.chantier || l.date < du || l.date > au) return;
+      var k = l.chantier + '|' + l.salarie;
+      t[k] = (t[k] || 0) + duree(l);
+      salIds[l.salarie] = true;
+      chIds[l.chantier] = true;
+    });
+    var sals = A.init.salaries.filter(function (s) { return salIds[s.id]; });
+    var chs = Object.keys(chIds).sort(function (a, b) { return String(ch[a] ? ch[a].nom : a).localeCompare(String(ch[b] ? ch[b].nom : b)); });
+    if (!chs.length) return h + '<div class="message info">Aucune heure saisie cette semaine.</div>';
+    var totSal = {}, totGeneral = 0;
+    h += '<div class="grille-cadre"><table class="compteur"><thead><tr><th class="col-nom">Chantier</th>'
+      + sals.map(function (s) { return '<th>' + esc(s.nom.split(' ')[0]) + '</th>'; }).join('') + '<th class="tot">Total</th></tr></thead><tbody>';
+    chs.forEach(function (c) {
+      var totCh = 0;
+      h += '<tr><td class="nom">' + esc(ch[c] ? ch[c].nom : c) + '</td>' + sals.map(function (s) {
+        var v = t[c + '|' + s.id] || 0;
+        totCh += v; totSal[s.id] = (totSal[s.id] || 0) + v;
+        return '<td>' + (v ? hCourt(v) : '<span class="vide">—</span>') + '</td>';
+      }).join('') + '<td class="tot">' + hCourt(totCh) + '</td></tr>';
+      totGeneral += totCh;
+    });
+    h += '<tr class="ligne-total"><td class="nom">Total</td>' + sals.map(function (s) { return '<td>' + hCourt(totSal[s.id] || 0) + '</td>'; }).join('')
+      + '<td class="tot">' + hCourt(totGeneral) + '</td></tr>';
+    return h + '</tbody></table></div><p class="aide-compteur">Heures réellement saisies par les salariés (pauses déduites), du lundi au dimanche.</p>';
+  }
+
+  // Sur téléphone, le planning se lit jour par jour : un salarié par carte, assez grande pour le doigt
+  function estMobile() { return !!(window.matchMedia && window.matchMedia('(max-width: 760px)').matches); }
+
+  function htmlGrilleMobile(mode, entete, salaries, ch, pr, re, auj) {
+    var jours = joursAffiches();
+    if (!A.jourMobile || jours.indexOf(A.jourMobile) < 0) A.jourMobile = jours.indexOf(auj) >= 0 ? auj : jours[0];
+    var j = A.jourMobile;
+    var h = entete + '<div class="jours-chips">' + jours.map(function (x) {
+      return '<button type="button" class="chip' + (x === j ? ' actif' : '') + (x === auj ? ' auj' : '') + '" data-jourmobile="' + x + '">' + esc(jourCourt(x)) + '</button>';
+    }).join('') + '</div>';
+    salaries.forEach(function (s) {
+      var k = s.id + '|' + j, p = pr[k] || [], r = re[k] || [];
+      var tp = total(p), tr = total(r), passe = j <= auj;
+      var type = mode === 'planning' ? 'prevu' : 'reel';
+      var contenu, pied = '';
+      if (mode === 'planning') {
+        contenu = htmlCasePlanning(p, r, ch) || '<span class="vide">Rien de prévu · toucher pour planifier</span>';
+        pied = heuresPlanning(p, r);
+      } else {
+        contenu = htmlCaseDouble(p, r, ch, passe) || '<span class="vide">Rien</span>';
+        if (j === auj && !journeeComplete(p, r)) pied = tp ? 'journée en cours' : '';
+        else if (r.length) pied = '<span class="' + (tr - tp < 0 ? 'txt-neg' : tr - tp === 0 ? 'txt-ok' : '') + '">' + (tr - tp === 0 ? 'Conforme' : fEcart(tr - tp)) + '</span>';
+        else if (passe && tp) pied = '<span class="txt-neg">Pas saisi</span>';
+      }
+      var classes = 'carte-sal' + (mode === 'planning' && r.length ? ' case-reel' : '') + (mode === 'planning' ? '' : ' cmp');
+      var attribut = mode === 'planning' ? 'data-prevu="' + k + '"' : (passe ? 'data-reel="' + k + '"' : '');
+      var corps = '<div class="nom-sal">' + esc(s.nom) + '</div>' + contenu + reperes(p, r)
+        + (pied ? '<div class="heures-jour">' + pied + '</div>' : '') + marqueEnvoi(type, s.id, j);
+      h += attribut ? '<button type="button" class="' + classes + '" ' + attribut + '>' + corps + '</button>' : '<div class="' + classes + '">' + corps + '</div>';
+    });
+    return h;
+  }
+
   function joursAffiches() {
     var j = [];
     for (var i = 0; i < (A.dimanche ? 7 : 6); i++) j.push(plusJours(A.lundi, i));
@@ -1023,8 +1321,9 @@
 
   /** « 08:00 » → « 8h », « 12:30 » → « 12h30 » : les cases sont étroites. */
   function hc(h) { var x = String(h).split(':'); return Number(x[0]) + 'h' + (x[1] && x[1] !== '00' ? x[1] : ''); }
-  function auMatin(l) { return !l.chantier || min(l.debut) < 12 * 60; }
-  function aLApresMidi(l) { return !l.chantier || min(l.fin) > 12 * 60; }
+  // Une absence de toute la journée (sans heures) compte pour le matin et l'après-midi
+  function auMatin(l) { return !l.debut || min(l.debut) < 12 * 60; }
+  function aLApresMidi(l) { return !l.debut || min(l.fin) > 12 * 60; }
   function dansMoment(l, matin) { return matin ? auMatin(l) : aLApresMidi(l); }
   /**
    * Créneaux à montrer pour le matin ou l'après-midi. Un créneau qui commence avant 12h et finit après
@@ -1049,22 +1348,70 @@
       if (!l.chantier) return '<div class="ch">' + esc(l.remarque || 'Absent') + '</div>';
       var nom = ch[l.chantier] ? ch[l.chantier].nom : l.chantierNom;
       return '<div class="ch">' + esc(nom) + '</div><div class="h">' + hc(l.debut) + '–<wbr>' + hc(l.fin) + '</div>'
-        + (l.pause ? '<div class="h">pause ' + hCourt(l.pause) + '</div>' : '')
-        + (l.remarque ? '<div class="note">' + esc(l.remarque) + '</div>' : '');
+        + (l.pause ? '<div class="h">pause ' + hCourt(l.pause) + '</div>' : '');
     }).join('');
   }
 
   /** Prévu à gauche, réel à droite ; le matin en haut, l'après-midi en bas (une journée 8h–17h est aux deux). */
-  function htmlCaseDouble(p, r, ch) {
+  function htmlCaseDouble(p, r, ch, passe) {
     var h = '';
     [true, false].forEach(function (matin) {
       var gp = pourMoment(p, matin);
       var gr = pourMoment(r, matin);
       if (!gp.length && !gr.length) return;
+      var attendu = gp.some(function (l) { return l.chantier; });
       h += '<div class="dbl' + (matin ? '' : ' suite') + '"><div class="dbl-c">' + lignesCompactes(gp, ch) + '</div>'
-        + '<div class="dbl-c r">' + lignesCompactes(gr, ch) + '</div></div>';
+        + '<div class="dbl-c r' + (!gr.length && attendu && passe ? ' manque-r' : '') + '">'
+        + (gr.length ? lignesCompactes(gr, ch) : (attendu && passe ? 'à saisir' : '')) + '</div></div>';
     });
     return h;
+  }
+
+  /** Petits repères : il y a des consignes (prévu) ou un commentaire du salarié (réel). On les lit en cliquant. */
+  function reperes(p, r) {
+    var h = '';
+    if (p.some(function (l) { return l.chantier && l.remarque; })) h += '<span class="repere">Consignes</span>';
+    if (r.some(function (l) { return l.chantier && l.remarque; })) h += '<span class="repere com">Commentaire</span>';
+    return h ? '<div class="reperes">' + h + '</div>' : '';
+  }
+
+  /** Une journée est complète quand chaque demi-journée prévue a des heures saisies. */
+  function journeeComplete(p, r) {
+    var attendus = [true, false].filter(function (m) { return pourMoment(p, m).some(function (l) { return l.chantier; }); });
+    return attendus.length ? attendus.every(function (m) { return pourMoment(r, m).length; }) : r.length > 0;
+  }
+
+  /** Texte à lire dans une fenêtre : consignes ou commentaires, chantier par chantier. */
+  function htmlTextes(titre, lignes, ch) {
+    var avec = lignes.filter(function (l) { return l.chantier && l.remarque; });
+    if (!avec.length) return '';
+    var vus = {};
+    return '<div class="info-lecture"><div class="bloc-titre">' + esc(titre) + '</div>' + avec.map(function (l) {
+      var cle = l.chantier + '|' + l.remarque;
+      if (vus[cle]) return '';
+      vus[cle] = true;
+      return '<div class="comm-lecture"><b>' + esc(ch[l.chantier] ? ch[l.chantier].nom : l.chantierNom) + '</b>' + esc(l.remarque) + '</div>';
+    }).join('') + '</div>';
+  }
+
+  /** Onglet Planning : pour chaque demi-journée, le réel s'il est saisi, sinon le prévu. */
+  function htmlCasePlanning(p, r, ch) {
+    var h = '';
+    [true, false].forEach(function (matin) {
+      var g = pourMoment(r, matin);
+      if (!g.length) g = pourMoment(p, matin);
+      if (g.length) h += '<div class="simple' + (h ? ' suite' : '') + '">' + lignesCompactes(g, ch) + '</div>';
+    });
+    return h;
+  }
+
+  /** Nombre d'heures sous la case du Planning : faites, prévues, ou ce qu'il reste à saisir. */
+  function heuresPlanning(p, r) {
+    var tp = total(p), tr = total(r);
+    if (!r.length) return tp ? hCourt(tp) + ' prévues' : '';
+    if (journeeComplete(p, r)) return hCourt(tr) + ' faites';
+    var manque = [true, false].filter(function (m) { return pourMoment(p, m).some(function (l) { return l.chantier; }) && !pourMoment(r, m).length; });
+    return hCourt(tr) + ' faites · ' + (manque[0] ? 'matin' : 'après-midi') + ' à saisir';
   }
 
   /** Une seule série de créneaux : le matin en haut, l'après-midi en bas. */
@@ -1102,6 +1449,7 @@
     if (!salaries.length) {
       return h + '<div class="message info">Aucun salarié pour l\'instant. Ajoutez-les dans l\'onglet <b>Réglages</b>.</div>';
     }
+    if (estMobile()) return htmlGrilleMobile(mode, h, salaries, ch, pr, re, auj);
     if (!A.init.chantiers.some(function (c) { return c.actif; })) {
       h += '<div class="message info">Aucun chantier pour l\'instant. Ajoutez-les dans l\'onglet <b>Réglages</b> avant de planifier.</div>';
     }
@@ -1119,20 +1467,21 @@
       jours.forEach(function (j) {
         var k = s.id + '|' + j, p = pr[k] || [], r = re[k] || [];
         var tp = total(p), tr = total(r);
-        totP += tp; totR += tr; if (j < auj || (j === auj && r.length)) totPjusquAuj += tp;
+        var complete = journeeComplete(p, r);
+        totP += tp; totR += tr; if (j < auj || (j === auj && complete)) totPjusquAuj += tp;
         var type = mode === 'planning' ? 'prevu' : 'reel';
         var classes = 'case' + (j === auj ? ' auj' : '') + (j > auj ? ' futur' : '') + (mode === 'planning' ? '' : ' cmp');
         var marque = marqueEnvoi(type, s.id, j);
         if (etatEnvoi(type, s.id, j) === 'erreur') classes += ' ecart-neg';
-        var contenu = htmlCaseDouble(p, r, ch);
         var passe = j <= auj;
+        var contenu = htmlCaseDouble(p, r, ch, passe);
 
         if (mode === 'planning') {
-          var montre = r.length ? r : p;
-          contenu = htmlCaseSimple(montre, ch);
+          contenu = htmlCasePlanning(p, r, ch);
           if (r.length) classes += ' case-reel';
-          var th = r.length ? tr : tp;
-          if (th) contenu += '<div class="heures-jour">' + hCourt(th) + (r.length ? ' faites' : ' prévues') + '</div>';
+          contenu += reperes(p, r);
+          var hj = heuresPlanning(p, r);
+          if (hj) contenu += '<div class="heures-jour">' + hj + '</div>';
           if (!contenu && !marque) { classes += ' vide-case'; contenu = '+'; }
           h += '<td><button type="button" class="' + classes + '" data-prevu="' + k + '" aria-label="Planifier ' + esc(s.nom) + ' le ' + esc(jourLong(j)) + '">'
             + contenu + marque + '</button></td>';
@@ -1140,17 +1489,18 @@
         }
         // Onglet Prévu / Réel : l'écart du jour en bas de la case
         var ecart = '';
-        if (r.length) {
+        if (j === auj && !complete) {
+          // Journée en cours : pas de rose tant qu'elle n'est pas finie
+          if (tp) ecart = '<div class="note">journée en cours</div>';
+        } else if (r.length) {
           var ec = tr - tp;
           if (ec < 0) classes += ' bord-neg'; else if (ec === 0) classes += ' bord-ok';
           ecart = '<div class="ecart">' + (ec === 0 ? 'Conforme' : fEcart(ec)) + '</div>';
         } else if (j < auj && tp > 0) {
           classes += ' bord-neg';
           ecart = '<div class="ecart">Pas saisi</div>';
-        } else if (j === auj && tp > 0) {
-          ecart = '<div class="note">pas encore saisi</div>';
         }
-        contenu += ecart + marque;
+        contenu += reperes(p, r) + ecart + marque;
         if (!contenu) contenu = passe ? '<span class="vide">—</span>' : '';
         h += '<td>' + (passe
           ? '<button type="button" class="' + classes + '" data-reel="' + k + '" aria-label="Corriger le réel de ' + esc(s.nom) + ' le ' + esc(jourLong(j)) + '">' + contenu + '</button>'
@@ -1244,6 +1594,7 @@
       setTimeout(function () { window.print(); }, 300);
       return;
     }
+    if (b.hasAttribute('data-jourmobile')) { A.jourMobile = b.getAttribute('data-jourmobile'); dessinerAdmin(); return; }
     if (b.hasAttribute('data-onglet')) { A.onglet = b.getAttribute('data-onglet'); dessinerAdmin(); chargerMoisSiBesoin(); return; }
     if (b.hasAttribute('data-mois')) {
       var nm = Number(b.getAttribute('data-mois'));
@@ -1272,12 +1623,18 @@
       var date = k[1];
       var existant = parJour(estPrevu ? A.d.prevu : A.d.reel)[k[0] + '|' + date] || [];
       var depart = existant;
+      var prevuJour = parJour(A.d.prevu)[k[0] + '|' + date] || [];
+      var reelJour = parJour(A.d.reel)[k[0] + '|' + date] || [];
       if (!estPrevu && !existant.length) {
-        depart = (parJour(A.d.prevu)[k[0] + '|' + date] || []).filter(function (l) { return l.chantier; });
+        // Le prévu sert de point de départ, sans recopier les consignes dans le commentaire
+        depart = prevuJour.filter(function (l) { return l.chantier; }).map(function (l) { return Object.assign({}, l, { remarque: '' }); });
       }
       fenetreJour({
         titre: (estPrevu ? 'Planning de ' : 'Heures réelles de ') + sal.nom, date: date, lignes: depart,
         chantiers: A.init.chantiers,
+        libelleRemarque: estPrevu ? 'Consignes pour ce chantier (une par ligne)' : 'Commentaire du salarié',
+        infoHaut: estPrevu ? htmlTextes('Commentaires de ' + sal.nom.split(' ')[0], reelJour, chantiersParId())
+          : htmlTextes('Consignes données', prevuJour, chantiersParId()),
         libelleAbsence: estPrevu ? 'Absent ce jour-là (congé, formation…)' : 'N\'a pas travaillé ce jour-là',
         joursSupp: estPrevu ? joursAffiches().filter(function (j) { return j !== date; }) : null,
         autresSalaries: estPrevu ? A.init.salaries.filter(function (x) { return x.actif && x.id !== sal.id; }) : null,

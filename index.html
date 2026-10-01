@@ -713,6 +713,7 @@
       var b = e.target.closest('button');
       if (!b) return;
       if (b.hasAttribute('data-annuler')) { fermer(); return; }
+      if (b.hasAttribute('data-corriger-reel') && o.corrigerReel) { fermer(); o.corrigerReel(); return; }
       if (b.hasAttribute('data-ajouter')) { lireChamps(); lignes.push(ligneVide(lignes[lignes.length - 1])); dessiner(); return; }
       if (b.hasAttribute('data-retirer')) { lireChamps(); lignes.splice(Number(b.getAttribute('data-retirer')), 1); dessiner(); return; }
       if (b.hasAttribute('data-effacer')) { validerEtFermer([]); return; }
@@ -1305,6 +1306,55 @@
     return h;
   }
 
+  /** Heures saisies par le salarié, en lecture, avec un bouton pour les corriger. */
+  function htmlReelLecture(sal, reelJour, ch) {
+    if (!reelJour.length) return '';
+    return '<div class="info-lecture"><div class="bloc-titre">Heures saisies par ' + esc(sal.nom.split(' ')[0]) + '</div>'
+      + reelJour.slice().sort(function (a, b) { return String(a.debut).localeCompare(String(b.debut)); }).map(function (l) {
+        var nom = l.chantier ? (ch[l.chantier] ? ch[l.chantier].nom : l.chantierNom) : (l.remarque || 'Absent');
+        return '<div class="comm-lecture"><b>' + esc(nom) + '</b>'
+          + (l.chantier ? heure(l.debut) + ' → ' + heure(l.fin) + (l.pause ? ', pause ' + fh(l.pause) : '') + ' = ' + fh(duree(l)) : '')
+          + (l.chantier && l.remarque ? '<div class="comm">' + esc(l.remarque) + '</div>' : '') + '</div>';
+      }).join('')
+      + '<button type="button" class="btn second petit" style="margin-top:8px" data-corriger-reel>Corriger ces heures</button></div>'
+      + '<div class="bloc-titre" style="margin:4px 0 6px">Planning prévu</div>';
+  }
+
+  /** Fenêtre d'une case : le prévu (onglet Planning) ou le réel (onglet Prévu / Réel). */
+  function ouvrirJourAdmin(estPrevu, salId, date) {
+    var sal = A.init.salaries.filter(function (s) { return s.id === salId; })[0];
+    var ch = chantiersParId();
+    var prevuJour = parJour(A.d.prevu)[salId + '|' + date] || [];
+    var reelJour = parJour(A.d.reel)[salId + '|' + date] || [];
+    var existant = estPrevu ? prevuJour : reelJour;
+    var depart = existant;
+    if (!estPrevu && !existant.length) {
+      // Le prévu sert de point de départ, sans recopier les consignes dans le commentaire
+      depart = prevuJour.filter(function (l) { return l.chantier; }).map(function (l) { return Object.assign({}, l, { remarque: '' }); });
+    }
+    fenetreJour({
+      titre: (estPrevu ? 'Planning de ' : 'Heures réelles de ') + sal.nom, date: date, lignes: depart,
+      chantiers: A.init.chantiers,
+      libelleRemarque: estPrevu ? 'Consignes pour ce chantier (une par ligne)' : 'Commentaire du salarié',
+      infoHaut: estPrevu ? htmlReelLecture(sal, reelJour, ch) : htmlTextes('Consignes données', prevuJour, ch),
+      corrigerReel: date <= A.d.aujourdhui ? function () { ouvrirJourAdmin(false, salId, date); } : null,
+      libelleAbsence: estPrevu ? 'Absent ce jour-là (congé, formation…)' : 'N\'a pas travaillé ce jour-là',
+      joursSupp: estPrevu ? joursAffiches().filter(function (j) { return j !== date; }) : null,
+      autresSalaries: estPrevu ? A.init.salaries.filter(function (x) { return x.actif && x.id !== sal.id; }) : null,
+      peutEffacer: existant.length > 0,
+      enregistrer: function (lignes, coches, autres) {
+        var dates = estPrevu ? [date].concat(coches || []) : [date];
+        var sals = estPrevu ? [sal.id].concat(autres || []) : [sal.id];
+        envoyer({
+          type: estPrevu ? 'prevu' : 'reel', per: A.d, sals: sals, dates: dates, lignes: lignes,
+          action: estPrevu ? 'admin.prevu' : 'admin.reel',
+          donnees: estPrevu ? { salaries: sals, dates: dates, lignes: lignes } : { salarie: sal.id, date: date, lignes: lignes },
+          redessiner: redessinerGrille
+        });
+      }
+    });
+  }
+
   function joursAffiches() {
     var j = [];
     for (var i = 0; i < (A.dimanche ? 7 : 6); i++) j.push(plusJours(A.lundi, i));
@@ -1611,37 +1661,7 @@
     if (b.hasAttribute('data-prevu') || b.hasAttribute('data-reel')) {
       var estPrevu = b.hasAttribute('data-prevu');
       var k = b.getAttribute(estPrevu ? 'data-prevu' : 'data-reel').split('|');
-      var sal = A.init.salaries.filter(function (s) { return s.id === k[0]; })[0];
-      var date = k[1];
-      var existant = parJour(estPrevu ? A.d.prevu : A.d.reel)[k[0] + '|' + date] || [];
-      var depart = existant;
-      var prevuJour = parJour(A.d.prevu)[k[0] + '|' + date] || [];
-      var reelJour = parJour(A.d.reel)[k[0] + '|' + date] || [];
-      if (!estPrevu && !existant.length) {
-        // Le prévu sert de point de départ, sans recopier les consignes dans le commentaire
-        depart = prevuJour.filter(function (l) { return l.chantier; }).map(function (l) { return Object.assign({}, l, { remarque: '' }); });
-      }
-      fenetreJour({
-        titre: (estPrevu ? 'Planning de ' : 'Heures réelles de ') + sal.nom, date: date, lignes: depart,
-        chantiers: A.init.chantiers,
-        libelleRemarque: estPrevu ? 'Consignes pour ce chantier (une par ligne)' : 'Commentaire du salarié',
-        infoHaut: estPrevu ? htmlTextes('Commentaires de ' + sal.nom.split(' ')[0], reelJour, chantiersParId())
-          : htmlTextes('Consignes données', prevuJour, chantiersParId()),
-        libelleAbsence: estPrevu ? 'Absent ce jour-là (congé, formation…)' : 'N\'a pas travaillé ce jour-là',
-        joursSupp: estPrevu ? joursAffiches().filter(function (j) { return j !== date; }) : null,
-        autresSalaries: estPrevu ? A.init.salaries.filter(function (x) { return x.actif && x.id !== sal.id; }) : null,
-        peutEffacer: existant.length > 0,
-        enregistrer: function (lignes, coches, autres) {
-          var dates = estPrevu ? [date].concat(coches || []) : [date];
-          var sals = estPrevu ? [sal.id].concat(autres || []) : [sal.id];
-          envoyer({
-            type: estPrevu ? 'prevu' : 'reel', per: A.d, sals: sals, dates: dates, lignes: lignes,
-            action: estPrevu ? 'admin.prevu' : 'admin.reel',
-            donnees: estPrevu ? { salaries: sals, dates: dates, lignes: lignes } : { salarie: sal.id, date: date, lignes: lignes },
-            redessiner: redessinerGrille
-          });
-        }
-      });
+      ouvrirJourAdmin(estPrevu, k[0], k[1]);
       return;
     }
     if (b.hasAttribute('data-copier')) {

@@ -106,6 +106,51 @@
   .ap-case.heures { min-height: 36px; font-weight: 500; font-size: 11px; font-variant-numeric: tabular-nums; }
   .moitie { padding: 2px 0 6px; }
   .moitie.suite { border-top: 1px dashed var(--bord); padding-top: 8px; }
+  /* ---------- Salarié : onglets, à venir, travaux, mes heures ---------- */
+  .onglets-s { display: grid; grid-template-columns: 1.15fr 1fr 1fr; margin: -16px -16px 12px; background: #fff; border-bottom: 1px solid var(--bord); position: sticky; top: 0; z-index: 5; }
+  .onglet-s { background: none; border: 0; border-bottom: 3px solid transparent; padding: 13px 4px; font-size: 15px; font-weight: 500; color: var(--gris); min-height: 48px; }
+  .onglet-s.actif { color: var(--rouge); font-weight: 700; border-bottom-color: var(--rouge); }
+  .onglet-s .nb, .replie .nb { display: inline-block; background: var(--rouge); color: #fff; font-size: 11px; font-weight: 700; border-radius: 10px; padding: 0 7px; margin-left: 3px; }
+  .astuce { font-size: 13px; color: var(--gris); margin: -6px 2px 10px; }
+  .titre-section { font-size: 12px; font-weight: 700; color: var(--gris); text-transform: uppercase; letter-spacing: .05em; margin: 16px 2px 6px; }
+  .mini { display: flex; width: 100%; align-items: center; gap: 10px; background: #fff; border: 1px solid var(--bord); border-radius: 12px; padding: 10px 12px; margin-bottom: 6px; text-align: left; }
+  .mini-d { width: 56px; flex: none; font-weight: 700; font-size: 15px; line-height: 1.15; }
+  .mini-d small { display: block; font-weight: 500; color: var(--gris); font-size: 12px; }
+  .mini-c { flex: 1; font-size: 14px; line-height: 1.4; min-width: 0; }
+  .mini .chev, .tache-s .chev { color: var(--gris-clair); font-size: 20px; }
+  .ap-case.asais { font-size: 9px; font-style: italic; font-weight: 500; color: var(--gris); border-style: dashed; }
+  .incite { margin-top: 10px; font-size: 13px; color: var(--gris); }
+  .tache-s { display: flex; width: 100%; gap: 12px; align-items: flex-start; background: #fff; border: 1px solid var(--bord); border-radius: 12px; padding: 12px; margin-bottom: 8px; text-align: left; }
+  .coche-s { width: 26px; height: 26px; border-radius: 7px; border: 2px solid #C9C0BD; flex: none; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; }
+  .coche-s.on { background: var(--vert); border-color: var(--vert); }
+  .tache-txt b { display: block; font-size: 15px; } .tache-txt small { display: block; font-size: 13px; color: var(--gris); }
+  .etat-s { display: inline-block; margin-top: 4px; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 10px; background: var(--fond-reel); color: #2F5E8E; }
+  .tache-s.faite { opacity: .6; } .tache-s.faite b { text-decoration: line-through; }
+  .replie { display: flex; width: 100%; align-items: center; gap: 6px; background: #fff; border: 1.5px solid var(--bord); border-radius: 12px; padding: 12px; margin-top: 10px; font-weight: 700; font-size: 15px; text-align: left; }
+  .replie .fl { margin-left: auto; color: var(--gris); }
+  .travaux-s { border: 1px solid var(--bord); border-top: 0; border-radius: 0 0 12px 12px; padding: 4px 12px 8px; margin-top: -6px; background: #fff; }
+  .tache-saisie { border-top: 1px solid #F1ECEA; padding: 6px 0; }
+  .tache-saisie:first-child { border-top: 0; }
+  .tache-saisie .case-a-cocher { align-items: flex-start; padding: 6px 0; }
+  .tache-saisie small { display: block; color: var(--gris); font-size: 12px; font-weight: 500; }
+  .trio.deux { grid-template-columns: 1fr 1fr; }
+  .choix-fini { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .choix-fini button { flex: 1; min-height: 40px; border: 1.5px solid var(--bord); border-radius: 9px; background: #fff; font-size: 14px; }
+  .choix-fini button.on { border-color: var(--vert); background: var(--vert-pale); color: var(--vert); font-weight: 700; }
+  .total-s { background: var(--fond-reel); border-radius: 10px; padding: 9px 12px; margin: 10px 0; font-size: 15px; }
+  .creneau-s + .creneau-s { border-top: 1px dashed var(--bord); margin-top: 8px; padding-top: 8px; }
+  .bloc-h { background: #fff; border: 1px solid var(--bord); border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; }
+  .chiffre-h { font-size: 19px; font-weight: 700; margin: 2px 0; } .chiffre-h small { font-size: 13px; font-weight: 500; color: var(--gris); }
+  .sous-h { font-size: 13px; color: var(--gris); margin-bottom: 6px; }
+  .ligne-h { display: flex; gap: 8px; align-items: baseline; padding: 6px 0; border-top: 1px solid #F1ECEA; font-size: 14px; }
+  .ligne-h span { flex: 1; } .ligne-h i { font-size: 12px; color: var(--gris); font-style: normal; } .ligne-h.gris { color: var(--gris-clair); }
+  .bloc-h.ligne-mois { display: flex; justify-content: space-between; font-size: 15px; }
+  /* ---------- Bureau : onglet Travaux ---------- */
+  .tr-rang { align-items: center; }
+  .tr-txt { flex: 1; min-width: 200px; } .tr-txt b { display: block; } .tr-txt small { display: block; color: var(--gris); font-size: 13px; }
+  .tr-select { min-height: 40px; padding: 6px 8px; border: 1.5px solid var(--bord); border-radius: 8px; background: #fff; }
+  .st-tr { font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 10px; background: var(--fond-prevu); color: var(--gris); white-space: nowrap; }
+  .st-tr.commence { background: var(--fond-reel); color: #2F5E8E; } .st-tr.fait { background: var(--vert-pale); color: var(--vert); }
   /* ---------- Salarié : bonjour, carte cliquable, demi-journées ---------- */
   .bonjour { font-size: 24px; font-weight: 700; margin: 2px 2px 12px; }
   .bouton-jour { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 8px; background: none; border: 0; padding: 0 0 8px; margin: 0 0 4px; text-align: left; border-bottom: 1px solid var(--bord); }
@@ -516,7 +561,7 @@
     dates.forEach(function (date) {
       lignes.forEach(function (l) {
         liste.push(l.chantier
-          ? { date: date, salarie: sal, chantier: l.chantier, chantierNom: '', debut: l.debut, fin: l.fin, pause: Number(l.pause) || 0, remarque: l.remarque || '' }
+          ? { date: date, salarie: sal, chantier: l.chantier, chantierNom: '', debut: l.debut, fin: l.fin, pause: Number(l.pause) || 0, remarque: l.remarque || '', travail: l.travail || '' }
           : { date: date, salarie: sal, chantier: '', chantierNom: '', debut: '', fin: '', pause: 0, remarque: l.remarque || 'Absent' });
       });
     });
@@ -545,8 +590,9 @@
     cles.forEach(function (k) { ENVOIS[k] = { etat: 'envoi', lignes: o.lignes }; });
     o.redessiner();
     fileEnvois = fileEnvois.then(function () {
-      return api(o.action, o.donnees).then(function () {
+      return api(o.action, o.donnees).then(function (rep) {
         cles.forEach(function (k) { if (ENVOIS[k].lignes === o.lignes) ENVOIS[k].etat = 'ok'; });
+        if (o.apres) o.apres(rep);
         o.redessiner();
         toast('Enregistré ✓');
       }, function (err) {
@@ -730,7 +776,7 @@
           if (lignes.some(function (l) { return !/^\d\d:\d\d$/.test(l.debut) || !/^\d\d:\d\d$/.test(l.fin); })) {
             dessiner('Heure illisible : tapez par exemple 0830 pour 8h30.'); return;
           }
-          a_envoyer = lignes.map(function (l) { return { chantier: l.chantier, debut: l.debut, fin: l.fin, pause: l.pause, remarque: l.remarque }; });
+          a_envoyer = lignes.map(function (l) { return { chantier: l.chantier, debut: l.debut, fin: l.fin, pause: l.pause, remarque: l.remarque, travail: l.travail || '' }; });
           var probleme = valider(a_envoyer);
           if (probleme) { dessiner(probleme); return; }
         }
@@ -752,11 +798,12 @@
   // ------------------------------------------------------------------------------------------
   // Vue du salarié
   // ------------------------------------------------------------------------------------------
-  var S = null;            // données chargées : { id, nom, aujourdhui, limite, chantiers, du, au, prevu, reel }
+  var S = null;            // données chargées : { id, nom, aujourdhui, limite, chantiers, collegues, du, au, prevu, reel, travaux }
   var lundiAffiche = null;
+  var ongletS = 'planning'; // 'planning' | 'travaux' | 'heures'
 
   function salarie(r) {
-    document.getElementById('quoi').textContent = 'Mes heures';
+    document.getElementById('quoi').textContent = 'Planning';
     document.getElementById('qui').textContent = r.nom;
     app.classList.add('etroit');
     var premier = !S;
@@ -770,6 +817,12 @@
   var MOIS_LONGS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
   function dateLongue(s) { var x = d(s); return maj(JOURS[x.getUTCDay()]) + ' ' + x.getUTCDate() + ' ' + MOIS_LONGS[x.getUTCMonth()]; }
   function chantiersS() { var m = {}; S.chantiers.forEach(function (c) { m[c.id] = c; }); return m; }
+  function nomChantier(id, chantiers, secours) { return chantiers[id] ? chantiers[id].nom : (secours || 'Chantier'); }
+  function lundiDe(s) { var j = d(s).getUTCDay(); return plusJours(s, j === 0 ? -6 : 1 - j); }
+  function passeMidi(l) { return l.chantier && l.debut && min(l.debut) < 12 * 60 && min(l.fin) > 12 * 60; }
+  function travauxOuverts() { return (S.travaux || []).filter(function (t) { return t.statut !== 'fait'; }); }
+  function travailParId(id) { return (S.travaux || []).filter(function (t) { return t.id === id; })[0]; }
+  function tempsPar(t) { return Object.keys(t.par || {}).map(function (n) { return n + ' ' + hCourt(t.par[n]); }).join(', '); }
 
   /** Les chantiers d'une journée dans l'ordre : de la première heure à la dernière, et leurs consignes (une par ligne). */
   function chantiersDuJour(lignes) {
@@ -786,24 +839,61 @@
     return res;
   }
 
-  function htmlConsignes(liste, chantiers) {
-    var blocs = liste.filter(function (x) { return x.consignes.length; });
-    if (!blocs.length) return '';
-    return '<div class="consignes">' + blocs.map(function (x) {
-      var c = chantiers[x.id];
-      return '<div class="bloc-cons"><div class="ct">Consignes — ' + esc(c ? c.nom : x.nom) + '</div>'
-        + x.consignes.map(function (t) { return '<div class="l">' + esc(t) + '</div>'; }).join('') + '</div>';
+  /** Une demi-journée prévue sur un chantier attend des heures ; une absence prévue, non. */
+  function journeeSaisie(p, r) {
+    var attendus = [true, false].filter(function (m) { return pourMoment(p, m).some(function (l) { return l.chantier; }); });
+    return attendus.length ? attendus.every(function (m) { return pourMoment(r, m).length; }) : r.length > 0;
+  }
+
+  // ------------------------------------------------------------------ onglets du salarié
+  function dessinerSalarie() {
+    var n = travauxOuverts().length;
+    var h = '<div class="onglets-s">' + [['planning', 'Mon planning'], ['travaux', 'Travaux' + (n ? ' <span class="nb">' + n + '</span>' : '')], ['heures', 'Mes heures']].map(function (o) {
+      return '<button type="button" class="onglet-s' + (ongletS === o[0] ? ' actif' : '') + '" data-onglet-s="' + o[0] + '">' + o[1] + '</button>';
     }).join('') + '</div>';
+    if (ongletS === 'travaux') h += htmlTravauxS();
+    else if (ongletS === 'heures') h += htmlMesHeures();
+    else h += htmlPlanningS();
+    app.innerHTML = h;
   }
 
-  /** En haut de la page : seulement le bonjour (le détail du jour s'ouvre en touchant la date). */
-  function htmlBonjour() {
-    return '<div class="bonjour">Bonjour ' + esc(String(S.nom || '').split(' ')[0]) + '</div>';
+  // ------------------------------------------------------------------ onglet « Mon planning »
+  function htmlPlanningS() {
+    var chantiers = chantiersS();
+    var pr = parJour(S.prevu), re = parJour(S.reel);
+    var h = '<div class="bonjour">Bonjour ' + esc(String(S.nom || '').split(' ')[0]) + '</div><div class="astuce">Touche un jour du tableau pour l\'ouvrir.</div>';
+    h += '<div class="semaine-nav"><button type="button" class="btn second" data-sem="-7" aria-label="Semaine précédente">◀</button>'
+      + '<div class="titre">' + esc(titreSemaine(lundiAffiche)) + '</div>'
+      + '<button type="button" class="btn second" data-sem="7" aria-label="Semaine suivante">▶</button></div>';
+    if (lundiAffiche !== lundiDe(S.aujourdhui)) h += '<div style="text-align:center;margin:-6px 0 10px"><button type="button" class="lien-btn" data-sem="0">Revenir à cette semaine</button></div>';
+    h += htmlApercu(pr, re, chantiers);
+    h += htmlCarteJour(S.aujourdhui, pr, re, chantiers);
+    var venir = '';
+    for (var i = 1; i <= 7; i++) {
+      var dt = plusJours(S.aujourdhui, i);
+      if (dt > S.au) break;
+      var p = pr[S.id + '|' + dt] || [];
+      if (d(dt).getUTCDay() === 0 && !p.length) continue;
+      venir += htmlLigneJour(dt, p, chantiers);
+    }
+    if (venir) h += '<div class="titre-section">À venir</div>' + venir;
+    return h;
   }
 
-  function passeMidi(l) { return l.chantier && l.debut && min(l.debut) < 12 * 60 && min(l.fin) > 12 * 60; }
+  /** Un jour à venir sur une ligne : chantiers et horaires ; un appui l'ouvre. */
+  function htmlLigneJour(date, p, chantiers) {
+    var x = d(date), lignes = [];
+    [true, false].forEach(function (m) {
+      pourMoment(p, m).forEach(function (l) {
+        var t = l.chantier ? '<b>' + esc(nomChantier(l.chantier, chantiers, l.chantierNom)) + '</b> ' + hc(l.debut) + '–' + hc(l.fin) : '<b>' + esc(l.remarque || 'Absent') + '</b>';
+        if (lignes.indexOf(t) < 0) lignes.push(t);
+      });
+    });
+    return '<button type="button" class="mini" data-detail="' + date + '"><span class="mini-d">' + maj(JOURS[x.getUTCDay()].slice(0, 3)) + '.<small>' + x.getUTCDate() + ' ' + MOIS[x.getUTCMonth()] + '</small></span>'
+      + '<span class="mini-c">' + (lignes.length ? lignes.join('<br>') : '<span class="vide">Rien de prévu</span>') + '</span><span class="chev">›</span></button>';
+  }
 
-  /** La carte d'une journée : matin et après-midi, prévu à gauche, mes heures à droite, un bouton par demi-journée. */
+  /** La carte du jour : matin et après-midi, prévu à gauche, mes heures à droite, un bouton par demi-journée. */
   function htmlCarteJour(date, pr, re, chantiers) {
     var p = pr[S.id + '|' + date] || [], r = re[S.id + '|' + date] || [];
     var auj = date === S.aujourdhui;
@@ -812,7 +902,7 @@
     var ev = etatEnvoi('reel', S.id, date);
     var attendus = [true, false].filter(function (m) { return pourMoment(p, m).some(function (l) { return l.chantier; }); });
     var saisi = function (m) { return pourMoment(r, m).length > 0; };
-    var complet = attendus.length ? attendus.every(saisi) : r.length > 0;
+    var complet = journeeSaisie(p, r);
     var faits = attendus.filter(saisi);
 
     var etiquette = '';
@@ -829,13 +919,15 @@
     var aConsignes = chantiersDuJour(p).some(function (x) { return x.consignes.length; });
     var h = '<div class="jour' + (auj ? ' aujourdhui' : '') + '" id="jour-' + date + '">'
       + '<button type="button" class="jour-tete bouton-jour" data-detail="' + date + '" aria-label="Voir le détail du ' + esc(jourLong(date)) + '">'
-      + '<span class="jour-nom">' + esc(jourLong(date)) + '</span>'
+      + '<span class="jour-nom">' + esc(jourLong(date)) + (auj ? ' · aujourd\'hui' : '') + '</span>'
       + '<span class="jour-droite">' + etiquette + '<span class="voir">' + (aConsignes ? 'Consignes' : 'Détail') + ' ›</span></span></button>';
-    var moments = [true, false].filter(function (m) { return pourMoment(p, m).length || pourMoment(r, m).length; });
-    if (!moments.length && modifiable) moments = [true, false];
+    // Un jour encore modifiable montre toujours le matin et l'après-midi : on peut saisir même sans prévu
+    var moments = modifiable ? [true, false] : [true, false].filter(function (m) { return pourMoment(p, m).length || pourMoment(r, m).length; });
     if (!moments.length) h += '<div class="vide">Rien de prévu</div>';
+    var momentLibre = false;
     moments.forEach(function (m) {
       var gp = pourMoment(p, m), gr = pourMoment(r, m);
+      if (!gp.some(function (l) { return l.chantier; }) && !gr.length) momentLibre = true;
       h += '<div class="moment-jour"><div class="bloc-titre">' + (m ? 'Matin' : 'Après-midi') + '</div>';
       var colP = gp.length ? htmlLignes(gp, chantiers, true, true) : '<div class="vide">Rien de prévu</div>';
       if (passe) {
@@ -852,6 +944,9 @@
       }
       h += '</div>';
     });
+    if (auj && modifiable && momentLibre && travauxOuverts().length) {
+      h += '<div class="incite">Rien de prévu sur une demi-journée : dans la saisie, tu pourras cocher les travaux en attente que tu as faits.</div>';
+    }
     if (ev === 'erreur') {
       h += '<div class="message erreur" style="margin:10px 0 0">Ces heures ne sont pas arrivées au bureau : ' + esc(ENVOIS['reel|' + S.id + '|' + date].message) + '</div>'
         + '<div class="actions-jour"><button type="button" class="btn plein" data-renvoyer="' + date + '">Réessayer l\'envoi</button></div>';
@@ -862,29 +957,69 @@
     return h + '</div>';
   }
 
-  function dessinerSalarie() {
-    var chantiers = chantiersS();
-    var pr = parJour(S.prevu), re = parJour(S.reel);
-    var h = htmlBonjour() + htmlCarteJour(S.aujourdhui, pr, re, chantiers);
-    h += '<div class="semaine-nav"><button type="button" class="btn second" data-sem="-7" aria-label="Semaine précédente">◀</button>'
-      + '<div class="titre">' + esc(titreSemaine(lundiAffiche)) + '</div>'
-      + '<button type="button" class="btn second" data-sem="7" aria-label="Semaine suivante">▶</button></div>';
-    if (lundiAffiche !== lundiDe(S.aujourdhui)) h += '<div style="text-align:center;margin:-6px 0 12px"><button type="button" class="lien-btn" data-sem="0">Revenir à cette semaine</button></div>';
-    h += htmlApercu(pr, chantiers);
+  /**
+   * Tableau de la semaine : un jour par colonne, matin et après-midi en lignes, le chantier prévu dans chaque case.
+   * Une journée 8h–17h apparaît matin et après-midi. Toucher une case ouvre le jour.
+   */
+  function htmlApercu(pr, re, chantiers) {
+    var jours = [];
     for (var i = 0; i < 7; i++) {
-      var date = plusJours(lundiAffiche, i);
-      if (date === S.aujourdhui) continue; // déjà en haut de la page
-      if (i === 6 && !pr[S.id + '|' + date] && !re[S.id + '|' + date]) continue;
-      h += htmlCarteJour(date, pr, re, chantiers);
+      var dt = plusJours(lundiAffiche, i);
+      if (i < 6 || pr[S.id + '|' + dt]) jours.push(dt);
     }
-    app.innerHTML = h;
+    var LETTRES = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
+    var texte = function (lignes) {
+      var noms = [];
+      lignes.forEach(function (l) {
+        var n = l.chantier ? nomChantier(l.chantier, chantiers, l.chantierNom) : (l.remarque || 'Absent');
+        if (noms.indexOf(n) < 0) noms.push(n);
+      });
+      return noms.length ? noms.map(esc).join('<br>') : '<span class="vide">·</span>';
+    };
+    var h = '<table class="apercu"><thead><tr><th></th>' + jours.map(function (dt) {
+      return '<th class="' + (dt === S.aujourdhui ? 'auj' : '') + '">' + LETTRES[d(dt).getUTCDay()] + '<span>' + d(dt).getUTCDate() + '</span></th>';
+    }).join('') + '</tr></thead><tbody>';
+    [['Matin', auMatin], ['Aprèm', aLApresMidi]].forEach(function (moment) {
+      h += '<tr><th class="moment">' + moment[0] + '</th>' + jours.map(function (dt) {
+        var lignes = (pr[S.id + '|' + dt] || []).filter(moment[1]);
+        return '<td><button type="button" class="ap-case' + (dt === S.aujourdhui ? ' auj' : '') + '" data-detail="' + dt + '" aria-label="Ouvrir le ' + esc(jourLong(dt)) + '">' + texte(lignes) + '</button></td>';
+      }).join('') + '</tr>';
+    });
+    // Heures prévues de la journée ; un jour passé pas encore saisi porte « à saisir »
+    h += '<tr><th class="moment">Heures</th>' + jours.map(function (dt) {
+      var p = pr[S.id + '|' + dt] || [], r = re[S.id + '|' + dt] || [];
+      var aSaisir = dt < S.aujourdhui && p.some(function (l) { return l.chantier; }) && !journeeSaisie(p, r);
+      var tp = total(p);
+      var t = aSaisir ? 'à saisir' : (tp ? hCourt(tp) : '<span class="vide">·</span>');
+      return '<td><button type="button" class="ap-case heures' + (dt === S.aujourdhui ? ' auj' : '') + (aSaisir ? ' asais' : '') + '" data-detail="' + dt + '" aria-label="Ouvrir le ' + esc(jourLong(dt)) + '">' + t + '</button></td>';
+    }).join('') + '</tr>';
+    return h + '</tbody></table>';
   }
 
-  /** Détail d'un jour : chaque chantier (horaires, adresse, collègues, consignes), puis mes heures et mes commentaires. */
+  /** Une fenêtre simple (détail, travail, ajout) : le contenu est fourni tout fait. */
+  function fenetreSimple(html, surClic) {
+    var voile = el('<div class="voile"></div>');
+    var f = el('<div class="fenetre"></div>');
+    f.innerHTML = html;
+    voile.appendChild(f);
+    document.body.appendChild(voile);
+    document.body.style.overflow = 'hidden';
+    var fermer = function () { voile.remove(); document.body.style.overflow = ''; };
+    f.addEventListener('click', function (e) {
+      var b = e.target.closest('button');
+      if (!b) return;
+      if (b.hasAttribute('data-fermer')) { fermer(); return; }
+      if (surClic) surClic(b, fermer, f);
+    });
+    return { f: f, fermer: fermer };
+  }
+
+  /** Le détail d'un jour : chantiers (adresse, horaires, collègues, consignes), mes heures, et les boutons de saisie. */
   function ouvrirDetail(date) {
     var chantiers = chantiersS();
     var p = parJour(S.prevu)[S.id + '|' + date] || [];
     var r = parJour(S.reel)[S.id + '|' + date] || [];
+    var modifiable = date <= S.aujourdhui && date >= S.limite;
     var h = '<h2>' + esc(dateLongue(date)) + '</h2><div class="sous">Détail de la journée</div>';
     var liste = chantiersDuJour(p);
     var absence = p.filter(function (l) { return !l.chantier; })[0];
@@ -902,52 +1037,217 @@
     });
     if (r.length) {
       h += '<div class="bloc-titre" style="margin-top:12px">Mes heures</div>' + r.slice().sort(function (a, b) { return String(a.debut).localeCompare(String(b.debut)); }).map(function (l) {
-        var nom = l.chantier ? (chantiers[l.chantier] ? chantiers[l.chantier].nom : l.chantierNom) : (l.remarque || 'Absent');
+        var t = l.travail ? travailParId(l.travail) : null;
+        var nom = l.chantier ? (t ? t.texte + ' (' + nomChantier(l.chantier, chantiers, l.chantierNom) + ')' : nomChantier(l.chantier, chantiers, l.chantierNom)) : (l.remarque || 'Absent');
         return '<div class="comm-lecture"><b>' + esc(nom) + '</b>'
           + (l.chantier ? heure(l.debut) + ' → ' + heure(l.fin) + (l.pause ? ', pause ' + fh(l.pause) : '') + ' = ' + fh(duree(l)) : '')
           + (l.chantier && l.remarque ? '<div class="comm">' + esc(l.remarque) + '</div>' : '') + '</div>';
       }).join('');
     }
-    h += '<div class="pied"><button type="button" class="btn" data-fermer>Fermer</button></div>';
-    var voile = el('<div class="voile"></div>');
-    var f = el('<div class="fenetre"></div>');
-    f.innerHTML = h;
-    voile.appendChild(f);
-    document.body.appendChild(voile);
-    document.body.style.overflow = 'hidden';
-    f.addEventListener('click', function (e) {
-      var b = e.target.closest('button');
-      if (b && b.hasAttribute('data-fermer')) { voile.remove(); document.body.style.overflow = ''; }
+    if (modifiable) {
+      var re = r;
+      h += '<div class="pied">' + [true, false].map(function (m) {
+        var fait = pourMoment(re, m).length > 0;
+        return '<button type="button" class="btn ' + (fait ? 'second' : '') + '" data-moment="' + date + '|' + (m ? 'm' : 'a') + '">' + (fait ? 'Corriger ' : 'Saisir ') + (m ? 'le matin' : 'l\'après-midi') + '</button>';
+      }).join('') + '</div>';
+    }
+    h += '<div class="pied"><button type="button" class="btn second" data-fermer>Fermer</button></div>';
+    fenetreSimple(h, function (b, fermer) {
+      if (b.hasAttribute('data-moment')) { fermer(); var x = b.getAttribute('data-moment').split('|'); saisirMoment(x[0], x[1] === 'm'); }
     });
   }
 
-  /** Saisie d'une demi-journée : heures vides à taper, prévu rappelé au-dessus, l'autre demi-journée n'est pas touchée. */
+  // ------------------------------------------------------------------ saisie d'une demi-journée
+  /**
+   * Heures vides à taper, prévu rappelé au-dessus ; les travaux en attente sont repliés et se cochent si besoin.
+   * L'autre demi-journée n'est pas touchée.
+   */
   function saisirMoment(date, matin) {
     var p = parJour(S.prevu)[S.id + '|' + date] || [];
     var r = parJour(S.reel)[S.id + '|' + date] || [];
     if (r.some(passeMidi)) { saisirJournee(date); return; } // saisie ancienne d'un seul bloc : on la corrige en entier
+    var chantiers = chantiersS();
     var dansCeMoment = function (l) { return !l.debut || (min(l.debut) < 12 * 60) === matin; };
     var ceMoment = r.filter(dansCeMoment);
     var autres = r.filter(function (l) { return !dansCeMoment(l); });
-    var chantiers = chantiersS();
     var gp = pourMoment(p, matin).filter(function (l) { return l.chantier; });
-    var rappel = gp.length
-      ? 'Prévu : ' + gp.map(function (l) { return (chantiers[l.chantier] ? chantiers[l.chantier].nom : l.chantierNom) + ', ' + heure(l.debut) + ' → ' + heure(l.fin); }).join(' puis ')
-      : 'Rien de prévu ' + (matin ? 'ce matin' : 'cet après-midi') + '.';
     var chantierPrevu = gp.length ? gp[0].chantier : '';
-    fenetreJour({
-      titre: matin ? 'Matin' : 'Après-midi', date: date, lignes: ceMoment,
-      chantiers: S.chantiers, chantierPrevu: chantierPrevu,
-      ligneDefaut: { chantier: chantierPrevu, debut: '', fin: '', pause: 0, remarque: '' },
-      infoHaut: '<div class="rappel">' + esc(rappel) + '</div>',
-      libelleAbsence: matin ? 'Je n\'ai pas travaillé ce matin' : 'Je n\'ai pas travaillé cet après-midi',
-      absenceHoraire: matin ? { debut: '00:00', fin: '12:00' } : { debut: '12:00', fin: '23:59' },
-      libelleRemarque: 'Commentaire pour le bureau (facultatif)',
-      libelleOk: matin ? 'Enregistrer le matin' : 'Enregistrer l\'après-midi',
-      peutEffacer: ceMoment.length > 0, libelleEffacer: 'Effacer ' + (matin ? 'le matin' : 'l\'après-midi'),
-      verifier: function (lignes) { return valider(autres.concat(lignes)); },
-      enregistrer: function (lignes) { enregistrerSalarie(date, autres.concat(lignes)); }
+    var rappel = gp.length
+      ? 'Prévu : ' + gp.map(function (l) { return nomChantier(l.chantier, chantiers, l.chantierNom) + ', ' + heure(l.debut) + ' → ' + heure(l.fin); }).join(' puis ')
+      : 'Rien de prévu ' + (matin ? 'ce matin' : 'cet après-midi') + '.';
+    var actifs = S.chantiers.filter(function (c) { return c.actif; });
+
+    // État de la fenêtre
+    var absenceLigne = ceMoment.filter(function (l) { return !l.chantier; })[0];
+    var absent = !!absenceLigne, motif = absenceLigne ? absenceLigne.remarque : '';
+    var creneaux = ceMoment.filter(function (l) { return l.chantier && !l.travail; }).map(function (l) { return { chantier: l.chantier, debut: l.debut, fin: l.fin, pause: Number(l.pause) || 0, autre: l.chantier !== chantierPrevu }; });
+    if (!creneaux.length) creneaux = [{ chantier: chantierPrevu, debut: '', fin: '', pause: 0, autre: !chantierPrevu }];
+    var faits = {}; // travail → { debut, fin, termine }
+    ceMoment.filter(function (l) { return l.travail; }).forEach(function (l) {
+      var t = travailParId(l.travail);
+      faits[l.travail] = { debut: l.debut, fin: l.fin, termine: !!(t && t.statut === 'fait') };
     });
+    var dejaFaits = Object.keys(faits);
+    var commentaire = (ceMoment.filter(function (l) { return l.chantier && l.remarque; })[0] || {}).remarque || '';
+    var deroule = dejaFaits.length > 0;
+    var listeTravaux = (S.travaux || []).filter(function (t) { return t.statut !== 'fait' || faits[t.id]; });
+
+    var fen = fenetreSimple('', function (b, fermer) {
+      lire();
+      if (b.hasAttribute('data-annuler')) { fermer(); return; }
+      if (b.hasAttribute('data-ajouter')) { creneaux.push({ chantier: '', debut: '', fin: '', pause: 0, autre: true }); dessiner(); return; }
+      if (b.hasAttribute('data-retirer')) { creneaux.splice(Number(b.getAttribute('data-retirer')), 1); dessiner(); return; }
+      if (b.hasAttribute('data-deroule')) { deroule = !deroule; dessiner(); return; }
+      if (b.hasAttribute('data-tfini')) { var x = b.getAttribute('data-tfini').split('|'); faits[x[0]].termine = x[1] === '1'; dessiner(); return; }
+      if (b.hasAttribute('data-effacer')) {
+        var etatsE = {};
+        dejaFaits.forEach(function (id) { etatsE[id] = 'a_faire'; });
+        fermer(); enregistrerSalarie(date, autres, etatsE); return;
+      }
+      if (b.hasAttribute('data-ok')) {
+        var res = construire();
+        if (res.erreur) { dessiner(res.erreur); return; }
+        fermer();
+        enregistrerSalarie(date, autres.concat(res.lignes), res.etats);
+      }
+    });
+    var f = fen.f;
+
+    function optionsChantier(sel) {
+      return '<option value="">— Choisir le chantier —</option>' + actifs.map(function (c) {
+        return '<option value="' + esc(c.id) + '"' + (c.id === sel ? ' selected' : '') + '>' + esc(c.nom) + '</option>';
+      }).join('');
+    }
+    function optionsPause(v) {
+      return PAUSES.map(function (x) { return '<option value="' + x + '"' + (x === Number(v) ? ' selected' : '') + '>' + (x ? fh(x) : '0') + '</option>'; }).join('');
+    }
+    function champHeure(attr, val) {
+      return '<input type="text" inputmode="numeric" autocomplete="off" maxlength="5" placeholder="--:--" data-heure ' + attr + ' value="' + esc(val || '') + '">';
+    }
+    function minutesTotal() {
+      var t = 0;
+      if (!absent) {
+        creneaux.forEach(function (c) { if (/^\d\d:\d\d$/.test(c.debut) && /^\d\d:\d\d$/.test(c.fin) && min(c.fin) > min(c.debut)) t += min(c.fin) - min(c.debut) - (Number(c.pause) || 0); });
+        Object.keys(faits).forEach(function (id) { var x = faits[id]; if (/^\d\d:\d\d$/.test(x.debut) && /^\d\d:\d\d$/.test(x.fin) && min(x.fin) > min(x.debut)) t += min(x.fin) - min(x.debut); });
+      }
+      return Math.max(0, t);
+    }
+
+    function dessiner(message) {
+      var nomM = matin ? 'ce matin' : 'cet après-midi';
+      var h = '<h2>' + (matin ? 'Matin' : 'Après-midi') + '</h2><div class="sous">' + esc(jourLong(date)) + '</div><div class="rappel">' + esc(rappel) + '</div>';
+      h += '<label class="case-a-cocher"><input type="checkbox" data-absent' + (absent ? ' checked' : '') + '> Je n\'ai pas travaillé ' + nomM + '</label>';
+      if (absent) {
+        h += '<label class="champ"><span>Motif</span><input type="text" data-motif maxlength="120" placeholder="Congé, maladie, école…" value="' + esc(motif) + '"></label>';
+      } else {
+        h += '<div class="ligne-saisie"><div class="bloc-titre">Sur un chantier</div>';
+        creneaux.forEach(function (c, i) {
+          h += '<div class="creneau-s" data-i="' + i + '">';
+          if (chantierPrevu && i === 0) {
+            h += '<label class="case-a-cocher"><input type="radio" name="choix-s" data-choix-s="prevu"' + (!c.autre ? ' checked' : '') + '> Chantier prévu : <b>' + esc(nomChantier(chantierPrevu, chantiers)) + '</b></label>'
+              + '<label class="case-a-cocher"><input type="radio" name="choix-s" data-choix-s="autre"' + (c.autre ? ' checked' : '') + '> J\'ai travaillé sur un autre chantier</label>';
+          }
+          if (c.autre || !chantierPrevu || i > 0) h += '<label class="champ"><span>Chantier</span><select data-c="chantier">' + optionsChantier(c.chantier) + '</select></label>';
+          h += '<div class="trio"><label class="champ"><span>Début</span>' + champHeure('data-c="debut"', c.debut) + '</label>'
+            + '<label class="champ"><span>Fin</span>' + champHeure('data-c="fin"', c.fin) + '</label>'
+            + '<label class="champ"><span>Pause</span><select data-c="pause">' + optionsPause(c.pause) + '</select></label></div>'
+            + (i > 0 ? '<button type="button" class="lien-btn" data-retirer="' + i + '">Retirer ce créneau</button>' : '')
+            + '</div>';
+        });
+        h += '<div class="aide-heure">Tapez l\'heure au clavier : 0830 pour 8h30.' + (listeTravaux.length ? ' À laisser vide si tu n\'as fait que des travaux en attente.' : '') + '</div>'
+          + '<button type="button" class="lien-btn" data-ajouter>+ Un autre créneau</button></div>';
+        if (listeTravaux.length) {
+          var nbCoches = Object.keys(faits).length;
+          h += '<button type="button" class="replie" data-deroule><span>Travaux en attente faits ' + nomM + '</span><span class="nb">' + (nbCoches || listeTravaux.length) + '</span><span class="fl">' + (deroule ? '▴' : '▾') + '</span></button>';
+          if (deroule) {
+            h += '<div class="travaux-s">' + listeTravaux.map(function (t) {
+              var x = faits[t.id];
+              var r = '<div class="tache-saisie"><label class="case-a-cocher"><input type="checkbox" data-travail="' + esc(t.id) + '"' + (x ? ' checked' : '') + '> <span><b>' + esc(t.texte) + '</b><small>' + esc(t.chantierNom || '') + (t.minutes ? ' · commencé : ' + esc(tempsPar(t)) : '') + '</small></span></label>';
+              if (x) {
+                r += '<div class="trio deux"><label class="champ"><span>De</span>' + champHeure('data-tdeb="' + esc(t.id) + '"', x.debut) + '</label>'
+                  + '<label class="champ"><span>À</span>' + champHeure('data-tfin="' + esc(t.id) + '"', x.fin) + '</label></div>'
+                  + '<div class="choix-fini"><button type="button" class="' + (x.termine ? 'on' : '') + '" data-tfini="' + esc(t.id) + '|1">Terminé</button>'
+                  + '<button type="button" class="' + (!x.termine ? 'on' : '') + '" data-tfini="' + esc(t.id) + '|0">Pas fini</button></div>';
+              }
+              return r + '</div>';
+            }).join('') + '</div>';
+          }
+        }
+        h += '<div class="total-s">Total ' + nomM + ' : <b data-total>' + fh(minutesTotal()) + '</b></div>'
+          + '<label class="champ"><span>Commentaire pour le bureau (facultatif)</span><textarea data-comm rows="3" maxlength="2000">' + esc(commentaire) + '</textarea></label>';
+      }
+      if (message) h += '<div class="erreur-saisie">' + esc(message) + '</div>';
+      h += '<div class="pied"><button type="button" class="btn second" data-annuler>Annuler</button><button type="button" class="btn" data-ok>Enregistrer ' + (matin ? 'le matin' : 'l\'après-midi') + '</button></div>';
+      if (ceMoment.length) h += '<div style="text-align:center;margin-top:6px"><button type="button" class="lien-btn" data-effacer>Effacer ' + (matin ? 'le matin' : 'l\'après-midi') + '</button></div>';
+      f.innerHTML = h;
+    }
+
+    function lire() {
+      var m = f.querySelector('[data-motif]'); if (m) motif = m.value;
+      var cm = f.querySelector('[data-comm]'); if (cm) commentaire = cm.value;
+      f.querySelectorAll('.creneau-s').forEach(function (bloc) {
+        var c = creneaux[Number(bloc.getAttribute('data-i'))];
+        bloc.querySelectorAll('[data-c]').forEach(function (x) {
+          var k = x.getAttribute('data-c');
+          c[k] = k === 'pause' ? Number(x.value) : k === 'chantier' ? x.value : (lireHeure(x.value) || x.value.trim());
+        });
+        if (!c.autre && chantierPrevu && Number(bloc.getAttribute('data-i')) === 0) c.chantier = chantierPrevu;
+      });
+      f.querySelectorAll('[data-tdeb]').forEach(function (x) { var id = x.getAttribute('data-tdeb'); if (faits[id]) faits[id].debut = lireHeure(x.value) || x.value.trim(); });
+      f.querySelectorAll('[data-tfin]').forEach(function (x) { var id = x.getAttribute('data-tfin'); if (faits[id]) faits[id].fin = lireHeure(x.value) || x.value.trim(); });
+    }
+
+    function construire() {
+      lire();
+      if (absent) {
+        return { lignes: [{ chantier: '', remarque: motif.trim() || 'Absent', debut: matin ? '00:00' : '12:00', fin: matin ? '12:00' : '23:59' }],
+          etats: dejaFaits.reduce(function (o, id) { o[id] = 'a_faire'; return o; }, {}) };
+      }
+      var heureOk = function (h) { return /^\d\d:\d\d$/.test(h); };
+      var lignes = [];
+      for (var i = 0; i < creneaux.length; i++) {
+        var c = creneaux[i];
+        var vide = !c.debut && !c.fin;
+        if (vide && i === 0 && Object.keys(faits).length) continue; // seulement des travaux en attente
+        if (vide && i === 0) return { erreur: 'Indique tes heures, ou coche un travail en attente fait.' };
+        if (!c.chantier) return { erreur: 'Choisis le chantier.' };
+        if (!heureOk(c.debut) || !heureOk(c.fin)) return { erreur: 'Heure illisible : tape par exemple 0830 pour 8h30.' };
+        lignes.push({ chantier: c.chantier, debut: c.debut, fin: c.fin, pause: c.pause, remarque: '' });
+      }
+      var etats = {};
+      var ids = Object.keys(faits);
+      for (var j = 0; j < ids.length; j++) {
+        var x = faits[ids[j]], t = travailParId(ids[j]);
+        if (!heureOk(x.debut) || !heureOk(x.fin)) return { erreur: 'Indique de quelle heure à quelle heure pour « ' + (t ? t.texte : 'le travail') + ' ».' };
+        lignes.push({ chantier: t ? t.chantier : '', travail: ids[j], debut: x.debut, fin: x.fin, pause: 0, remarque: '' });
+        etats[ids[j]] = x.termine ? 'fait' : 'a_faire';
+      }
+      dejaFaits.forEach(function (id) { if (!faits[id]) etats[id] = 'a_faire'; });
+      if (lignes.length && commentaire.trim()) lignes[0].remarque = commentaire.trim();
+      var pb = valider(autres.concat(lignes));
+      if (pb) return { erreur: pb };
+      return { lignes: lignes, etats: etats };
+    }
+
+    f.addEventListener('change', function (e) {
+      var t = e.target;
+      if (t.hasAttribute('data-absent')) { lire(); absent = t.checked; dessiner(); return; }
+      if (t.hasAttribute('data-choix-s')) { lire(); creneaux[0].autre = t.getAttribute('data-choix-s') === 'autre'; creneaux[0].chantier = creneaux[0].autre ? '' : chantierPrevu; dessiner(); return; }
+      if (t.hasAttribute('data-travail')) {
+        lire();
+        var id = t.getAttribute('data-travail');
+        if (t.checked) faits[id] = { debut: '', fin: '', termine: true }; else delete faits[id];
+        dessiner(); return;
+      }
+      lire(); var tot = f.querySelector('[data-total]'); if (tot) tot.textContent = fh(minutesTotal());
+    });
+    f.addEventListener('input', function () { lire(); var tot = f.querySelector('[data-total]'); if (tot) tot.textContent = fh(minutesTotal()); });
+    f.addEventListener('focusin', function (e) { if (e.target.hasAttribute && e.target.hasAttribute('data-heure')) setTimeout(function () { e.target.select(); }, 0); });
+    f.addEventListener('focusout', function (e) {
+      if (!e.target.hasAttribute || !e.target.hasAttribute('data-heure')) return;
+      var h = lireHeure(e.target.value); if (h) e.target.value = h;
+    });
+    dessiner();
   }
 
   /** Correction de toute la journée d'un coup (ancienne saisie d'un seul bloc 8h–17h). */
@@ -961,64 +1261,172 @@
     });
   }
 
-  function lundiDe(s) { var j = d(s).getUTCDay(); return plusJours(s, j === 0 ? -6 : 1 - j); }
-
-  /**
-   * Tableau de la semaine : un jour par colonne, matin et après-midi en lignes, le chantier prévu dans chaque case.
-   * Un créneau qui commence avant 12h est du matin ; un créneau qui finit après 12h est de l'après-midi :
-   * une journée 8h–17h apparaît donc dans les deux.
-   */
-  function htmlApercu(pr, chantiers) {
-    var jours = [];
-    for (var i = 0; i < 7; i++) {
-      var dt = plusJours(lundiAffiche, i);
-      if (i < 6 || pr[S.id + '|' + dt]) jours.push(dt);
-    }
-    var LETTRES = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
-    var texte = function (lignes) {
-      var noms = [];
-      lignes.forEach(function (l) {
-        var n = l.chantier ? (chantiers[l.chantier] ? chantiers[l.chantier].nom : l.chantierNom) : (l.remarque || 'Absent');
-        if (noms.indexOf(n) < 0) noms.push(n);
-      });
-      return noms.length ? noms.map(esc).join('<br>') : '<span class="vide">·</span>';
-    };
-    var h = '<table class="apercu"><thead><tr><th></th>' + jours.map(function (dt) {
-      return '<th class="' + (dt === S.aujourdhui ? 'auj' : '') + '">' + LETTRES[d(dt).getUTCDay()] + '<span>' + d(dt).getUTCDate() + '</span></th>';
-    }).join('') + '</tr></thead><tbody>';
-    [['Matin', auMatin], ['Aprèm', aLApresMidi]].forEach(function (moment) {
-      h += '<tr><th class="moment">' + moment[0] + '</th>' + jours.map(function (dt) {
-        var lignes = (pr[S.id + '|' + dt] || []).filter(moment[1]);
-        return '<td><button type="button" class="ap-case' + (dt === S.aujourdhui ? ' auj' : '') + '" data-aller="' + dt + '" aria-label="Voir le ' + esc(jourLong(dt)) + '">' + texte(lignes) + '</button></td>';
-      }).join('') + '</tr>';
+  function enregistrerSalarie(date, lignes, travauxEtat) {
+    // Les travaux cochés changent d'état tout de suite à l'écran ; Google renvoie ensuite la liste à jour
+    Object.keys(travauxEtat || {}).forEach(function (id) {
+      var t = travailParId(id);
+      if (!t) return;
+      t.statut = travauxEtat[id];
+      if (t.statut === 'fait') { t.faitPar = S.nom; t.faitLe = date; }
     });
-    // Nombre d'heures prévues dans la journée (pauses déduites)
-    h += '<tr><th class="moment">Heures</th>' + jours.map(function (dt) {
-      var tp = total(pr[S.id + '|' + dt] || []);
-      var t = tp ? hCourt(tp) : '<span class="vide">·</span>';
-      return '<td><button type="button" class="ap-case heures' + (dt === S.aujourdhui ? ' auj' : '') + '" data-aller="' + dt + '" aria-label="Voir le ' + esc(jourLong(dt)) + '">' + t + '</button></td>';
-    }).join('') + '</tr>';
-    return h + '</tbody></table>';
+    envoyer({ type: 'reel', per: S, sal: S.id, dates: [date], lignes: lignes,
+      action: 'moi.enregistrer', donnees: { date: date, lignes: lignes, travauxEtat: travauxEtat || {} },
+      apres: function (rep) { if (rep && rep.travaux) S.travaux = rep.travaux; },
+      redessiner: dessinerSalarie });
   }
 
-  function enregistrerSalarie(date, lignes) {
-    envoyer({ type: 'reel', per: S, sal: S.id, dates: [date], lignes: lignes,
-      action: 'moi.enregistrer', donnees: { date: date, lignes: lignes }, redessiner: dessinerSalarie });
+  // ------------------------------------------------------------------ onglet « Travaux »
+  function htmlTravauxS() {
+    var ouverts = travauxOuverts();
+    var debutSemaine = lundiDe(S.aujourdhui);
+    var faitsSemaine = (S.travaux || []).filter(function (t) { return t.statut === 'fait' && t.faitLe >= debutSemaine; });
+    var h = '<div class="astuce" style="margin-top:4px">Touche un travail quand tu l\'as fait (ou commencé) : tu indiques tes heures, elles comptent dans ta journée.</div>';
+    if (!ouverts.length) h += '<div class="message info">Aucun travail en attente pour l\'instant.</div>';
+    ouverts.forEach(function (t) {
+      h += '<button type="button" class="tache-s" data-tache="' + esc(t.id) + '"><span class="coche-s"></span><span class="tache-txt"><b>' + esc(t.texte) + '</b>'
+        + '<small>' + esc(t.chantierNom || '') + (t.creePar ? ' · ajouté par ' + esc(String(t.creePar).split(' ')[0]) : '') + '</small>'
+        + (t.minutes ? '<span class="etat-s">commencé : ' + esc(tempsPar(t)) + '</span>' : '') + '</span></button>';
+    });
+    h += '<button type="button" class="btn second plein" data-proposer style="margin-top:6px">+ Ajouter un travail</button>';
+    if (faitsSemaine.length) {
+      h += '<div class="titre-section">Faits cette semaine</div>' + faitsSemaine.map(function (t) {
+        return '<div class="tache-s faite"><span class="coche-s on">✓</span><span class="tache-txt"><b>' + esc(t.texte) + '</b><small>Fait par '
+          + esc(String(t.faitPar || '').split(' ')[0]) + ' le ' + esc(t.faitLe ? jourCourt(t.faitLe) : '') + (t.minutes ? ' · ' + hCourt(t.minutes) : '') + '</small></span></div>';
+      }).join('');
+    }
+    return h;
+  }
+
+  /** Cocher un travail depuis l'onglet Travaux : le jour, de quelle heure à quelle heure, terminé ou pas. */
+  function ouvrirTache(id) {
+    var t = travailParId(id);
+    if (!t) return;
+    var jours = [];
+    for (var i = 0; i <= 2; i++) { var dt = plusJours(S.aujourdhui, -i); if (dt >= S.limite) jours.push(dt); }
+    var etat = { date: S.aujourdhui, debut: '', fin: '', termine: true, comm: '' };
+    var fen = fenetreSimple('', function (b, fermer) {
+      lireT();
+      if (b.hasAttribute('data-annuler')) { fermer(); return; }
+      if (b.hasAttribute('data-tjour')) { etat.date = b.getAttribute('data-tjour'); dessinerT(); return; }
+      if (b.hasAttribute('data-tfini')) { etat.termine = b.getAttribute('data-tfini').split('|')[1] === '1'; dessinerT(); return; }
+      if (b.hasAttribute('data-ok')) {
+        if (!/^\d\d:\d\d$/.test(etat.debut) || !/^\d\d:\d\d$/.test(etat.fin)) { dessinerT('Indique de quelle heure à quelle heure : 1330 pour 13h30.'); return; }
+        var r = parJour(S.reel)[S.id + '|' + etat.date] || [];
+        var ligne = { chantier: t.chantier, travail: t.id, debut: etat.debut, fin: etat.fin, pause: 0, remarque: etat.comm.trim() };
+        var pb = valider(r.concat([ligne]));
+        if (pb) { dessinerT(pb); return; }
+        var etats = {}; etats[t.id] = etat.termine ? 'fait' : 'a_faire';
+        fermer();
+        enregistrerSalarie(etat.date, r.map(function (l) { return { chantier: l.chantier, debut: l.debut, fin: l.fin, pause: l.pause, remarque: l.remarque, travail: l.travail || '' }; }).concat([ligne]), etats);
+      }
+    });
+    var f = fen.f;
+    function lireT() {
+      var a = f.querySelector('[data-tdeb]'), b = f.querySelector('[data-tfin]'), c = f.querySelector('[data-comm]');
+      if (a) etat.debut = lireHeure(a.value) || a.value.trim();
+      if (b) etat.fin = lireHeure(b.value) || b.value.trim();
+      if (c) etat.comm = c.value;
+    }
+    function dessinerT(message) {
+      var h = '<h2>' + esc(t.texte) + '</h2><div class="sous">' + esc(t.chantierNom || '') + '</div><div class="rappel">Ces heures s\'ajoutent à ta journée.</div>'
+        + '<div class="bloc-titre">Quel jour ?</div><div class="choix-fini">' + jours.map(function (dt) {
+          return '<button type="button" class="' + (dt === etat.date ? 'on' : '') + '" data-tjour="' + dt + '">' + (dt === S.aujourdhui ? 'Aujourd\'hui' : esc(jourCourt(dt))) + '</button>';
+        }).join('') + '</div>'
+        + '<div class="trio deux" style="margin-top:10px"><label class="champ"><span>De</span><input type="text" inputmode="numeric" maxlength="5" placeholder="--:--" data-heure data-tdeb value="' + esc(etat.debut) + '"></label>'
+        + '<label class="champ"><span>À</span><input type="text" inputmode="numeric" maxlength="5" placeholder="--:--" data-heure data-tfin value="' + esc(etat.fin) + '"></label></div>'
+        + '<div class="choix-fini"><button type="button" class="' + (etat.termine ? 'on' : '') + '" data-tfini="x|1">Terminé</button><button type="button" class="' + (!etat.termine ? 'on' : '') + '" data-tfini="x|0">Pas fini</button></div>'
+        + '<label class="champ" style="margin-top:10px"><span>Commentaire (facultatif)</span><textarea data-comm rows="2" maxlength="2000">' + esc(etat.comm) + '</textarea></label>'
+        + (message ? '<div class="erreur-saisie">' + esc(message) + '</div>' : '')
+        + '<div class="pied"><button type="button" class="btn second" data-annuler>Annuler</button><button type="button" class="btn" data-ok>Enregistrer</button></div>';
+      f.innerHTML = h;
+    }
+    f.addEventListener('focusin', function (e) { if (e.target.hasAttribute && e.target.hasAttribute('data-heure')) setTimeout(function () { e.target.select(); }, 0); });
+    f.addEventListener('focusout', function (e) { if (e.target.hasAttribute && e.target.hasAttribute('data-heure')) { var h = lireHeure(e.target.value); if (h) e.target.value = h; } });
+    dessinerT();
+  }
+
+  /** Un ouvrier ajoute un travail repéré : il entre directement dans la liste commune. */
+  function ouvrirProposer() {
+    var actifs = S.chantiers.filter(function (c) { return c.actif; });
+    var fen = fenetreSimple('<h2>Ajouter un travail</h2><div class="sous">Il s\'ajoute à la liste de tout le monde.</div>'
+      + '<label class="champ"><span>Le travail</span><textarea data-ptexte rows="2" maxlength="200" placeholder="Ex. : fuite sous l\'évier de la cuisine"></textarea></label>'
+      + '<label class="champ"><span>Chantier</span><select data-pchantier><option value="">— Choisir le chantier —</option>' + actifs.map(function (c) { return '<option value="' + esc(c.id) + '">' + esc(c.nom) + '</option>'; }).join('') + '</select></label>'
+      + '<div class="erreur-saisie" data-perr></div>'
+      + '<div class="pied"><button type="button" class="btn second" data-fermer>Annuler</button><button type="button" class="btn" data-ok>Ajouter</button></div>',
+      function (b, fermer, f) {
+        if (!b.hasAttribute('data-ok')) return;
+        var texte = f.querySelector('[data-ptexte]').value.trim(), ch = f.querySelector('[data-pchantier]').value;
+        if (!texte || !ch) { f.querySelector('[data-perr]').textContent = 'Décris le travail et choisis le chantier.'; return; }
+        b.disabled = true;
+        api('moi.travail', { texte: texte, chantier: ch }).then(function (r) {
+          S.travaux = r.travaux; fermer(); dessinerSalarie(); toast('Travail ajouté ✓');
+        }).catch(function (e) { b.disabled = false; f.querySelector('[data-perr]').textContent = e.message; });
+      });
+  }
+
+  // ------------------------------------------------------------------ onglet « Mes heures »
+  function htmlMesHeures() {
+    var re = parJour(S.reel), pr = parJour(S.prevu);
+    var auj = S.aujourdhui;
+    var faitesJour = function (dt) { return total(re[S.id + '|' + dt] || []); };
+    var lundi = lundiDe(auj);
+    var h = '';
+    // Cette semaine
+    var semaine = 0, prevues = 0, reste = [], lignes = '';
+    for (var i = 0; i < 7; i++) {
+      var dt = plusJours(lundi, i);
+      var p = pr[S.id + '|' + dt] || [], r = re[S.id + '|' + dt] || [];
+      if (i === 6 && !p.length && !r.length) continue;
+      var t = total(r);
+      semaine += t; prevues += total(p);
+      var note = '';
+      if (dt <= auj && p.some(function (l) { return l.chantier; }) && !journeeSaisie(p, r)) {
+        var manque = [true, false].filter(function (m) { return pourMoment(p, m).some(function (l) { return l.chantier; }) && !pourMoment(r, m).length; });
+        var quoi = manque.length === 2 ? '' : (manque[0] ? ' matin' : ' après-midi');
+        reste.push(JOURS[d(dt).getUTCDay()] + quoi);
+        note = '<i>' + (manque.length === 2 ? 'à saisir' : (manque[0] ? 'matin à saisir' : 'après-midi à saisir')) + '</i>';
+      }
+      lignes += '<div class="ligne-h' + (dt > auj ? ' gris' : '') + '"><span>' + esc(jourCourt(dt)) + '</span>' + note + '<b>' + (t ? hCourt(t) : '—') + '</b></div>';
+    }
+    h += '<div class="bloc-h"><div class="bloc-titre">Cette semaine · ' + esc(titreSemaine(lundi).replace('Semaine du ', '')) + '</div>'
+      + '<div class="chiffre-h">' + hCourt(semaine) + ' <small>faites</small></div>'
+      + '<div class="sous-h">' + hCourt(prevues) + ' prévues' + (reste.length ? ' · encore à saisir : ' + esc(reste.join(', ')) : '') + '</div>' + lignes + '</div>';
+    // Ce mois-ci, semaine par semaine
+    var mois = auj.slice(0, 7);
+    var debutMois = mois + '-01';
+    var finMois = (function () { var x = d(debutMois); x.setUTCMonth(x.getUTCMonth() + 1); x.setUTCDate(0); return x.toISOString().slice(0, 10); })();
+    var totMois = 0, lignesMois = '';
+    for (var l = lundiDe(debutMois); l <= finMois; l = plusJours(l, 7)) {
+      var du = l < debutMois ? debutMois : l, au = plusJours(l, 6) > finMois ? finMois : plusJours(l, 6);
+      if (du > auj) break;
+      var tw = 0;
+      for (var x2 = du; x2 <= au; x2 = plusJours(x2, 1)) tw += faitesJour(x2);
+      totMois += tw;
+      var jourDu = d(du).getUTCDate();
+      lignesMois += '<div class="ligne-h"><span>Semaine du ' + (jourDu === 1 ? '1er' : jourDu) + '</span><b>' + hCourt(tw) + '</b></div>';
+    }
+    h += '<div class="bloc-h"><div class="bloc-titre">' + maj(MOIS_LONGS[Number(mois.slice(5, 7)) - 1]) + ' ' + mois.slice(0, 4) + '</div>'
+      + '<div class="chiffre-h">' + hCourt(totMois) + ' <small>faites</small></div>' + lignesMois + '</div>';
+    // Le mois dernier
+    var prec = (function () { var x = d(debutMois); x.setUTCMonth(x.getUTCMonth() - 1); return x.toISOString().slice(0, 7); })();
+    var debutPrec = prec + '-01';
+    if (S.du <= debutPrec) {
+      var totPrec = 0;
+      for (var x3 = debutPrec; x3 < debutMois; x3 = plusJours(x3, 1)) totPrec += faitesJour(x3);
+      h += '<div class="bloc-h ligne-mois"><span>' + maj(MOIS_LONGS[Number(prec.slice(5, 7)) - 1]) + ' ' + prec.slice(0, 4) + '</span><b>' + hCourt(totPrec) + '</b></div>';
+    }
+    return h + '<div class="astuce">Heures saisies, pauses déduites.</div>';
   }
 
   app.addEventListener('click', function (e) {
     if (CONF.role !== 'salarie') return;
     var b = e.target.closest('button');
     if (!b) return;
+    if (b.hasAttribute('data-onglet-s')) { ongletS = b.getAttribute('data-onglet-s'); dessinerSalarie(); window.scrollTo(0, 0); return; }
     if (b.hasAttribute('data-sem')) {
       var n = Number(b.getAttribute('data-sem'));
       lundiAffiche = n === 0 ? lundiDe(S.aujourdhui) : plusJours(lundiAffiche, n);
       naviguer(S, lundiAffiche, 'moi.semaine', dessinerSalarie);
-      return;
-    }
-    if (b.hasAttribute('data-aller')) {
-      var carte = document.getElementById('jour-' + b.getAttribute('data-aller'));
-      if (carte) carte.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
     if (b.hasAttribute('data-renvoyer')) {
@@ -1032,6 +1440,8 @@
       return;
     }
     if (b.hasAttribute('data-detail')) { ouvrirDetail(b.getAttribute('data-detail')); return; }
+    if (b.hasAttribute('data-tache')) { ouvrirTache(b.getAttribute('data-tache')); return; }
+    if (b.hasAttribute('data-proposer')) { ouvrirProposer(); return; }
   });
 
   // ------------------------------------------------------------------------------------------
@@ -1053,7 +1463,7 @@
   }
 
   // Un envoi qui se termine ne redessine pas l'onglet Réglages : on y perdrait ce qui est en cours de frappe
-  function redessinerGrille() { if (A.onglet !== 'reglages') dessinerAdmin(); }
+  function redessinerGrille() { if (A.onglet !== 'reglages' && A.onglet !== 'travaux') dessinerAdmin(); }
   if (window.matchMedia) {
     var mq = window.matchMedia('(max-width: 760px)');
     var auChangement = function () { if (CONF.role === 'responsable' && A.init) redessinerGrille(); };
@@ -1164,12 +1574,13 @@
 
   function dessinerAdmin() {
     var h = '<div class="onglets">'
-      + [['planning', 'Planning'], ['reel', 'Prévu / Réel'], ['chantiers', 'Chantiers'], ['compteur', 'Compteur'], ['reglages', 'Réglages']].map(function (o) {
+      + [['planning', 'Planning'], ['reel', 'Prévu / Réel'], ['travaux', 'Travaux'], ['chantiers', 'Chantiers'], ['compteur', 'Compteur'], ['reglages', 'Réglages']].map(function (o) {
         return '<button type="button" class="onglet' + (A.onglet === o[0] ? ' actif' : '') + '" data-onglet="' + o[0] + '">' + o[1] + '</button>';
       }).join('') + '</div>';
     if (A.onglet === 'reglages') h += htmlReglages();
     else if (A.onglet === 'compteur') h += htmlCompteur();
     else if (A.onglet === 'chantiers') h += htmlChantiers();
+    else if (A.onglet === 'travaux') h += htmlTravauxAdmin();
     else h += htmlGrille(A.onglet);
     app.innerHTML = h;
   }
@@ -1231,6 +1642,58 @@
     });
     return h + '</tbody></table></div>'
       + '<p class="aide-compteur">Heures réellement saisies (pauses déduites). Une semaine à cheval sur deux mois ne compte ici que ses jours du mois.</p>';
+  }
+
+  /** Travaux en attente : la liste commune, ce qui est commencé ou fait, par qui et en combien de temps. */
+  function htmlTravauxAdmin() {
+    var actifs = A.init.chantiers.filter(function (c) { return c.actif; });
+    var liste = (A.init.travaux || []).slice().sort(function (a, b) { return (a.statut === 'fait') - (b.statut === 'fait'); });
+    var h = '<div class="panneau"><h3>Ajouter un travail</h3><p class="aide">La liste est commune à tous les ouvriers. Ceux qu\'ils ajoutent eux-mêmes y entrent directement.</p>'
+      + '<div class="rang"><input type="text" class="adr-in" data-tr-texte maxlength="200" placeholder="Ex. : ranger et trier le dépôt">'
+      + '<select class="tr-select" data-tr-chantier><option value="">— Chantier —</option>' + actifs.map(function (c) { return '<option value="' + esc(c.id) + '">' + esc(c.nom) + '</option>'; }).join('') + '</select>'
+      + '<button type="button" class="btn petit" data-tr-ajout>Ajouter</button></div></div>';
+    h += '<div class="panneau"><h3>Travaux</h3>';
+    if (!liste.length) h += '<p class="aide">Aucun travail pour l\'instant.</p>';
+    liste.forEach(function (t) {
+      var etat = t.statut === 'fait'
+        ? '<span class="st-tr fait">Fait · ' + esc(String(t.faitPar || '').split(' ')[0]) + ' ' + esc(t.faitLe ? jourCourt(t.faitLe) : '') + (t.minutes ? ' · ' + hCourt(t.minutes) : '') + '</span>'
+        : t.minutes ? '<span class="st-tr commence">Commencé · ' + esc(Object.keys(t.par || {}).map(function (n) { return n + ' ' + hCourt(t.par[n]); }).join(', ')) + '</span>'
+          : '<span class="st-tr">À faire</span>';
+      h += '<div class="rang tr-rang' + (t.statut === 'fait' ? ' inactif' : '') + '"><div class="tr-txt"><b>' + esc(t.texte) + '</b><small>' + esc(t.chantierNom || '')
+        + (t.creePar ? ' · ajouté par ' + esc(String(t.creePar).split(' ')[0]) : '') + '</small></div>' + etat
+        + '<button type="button" class="btn second petit" data-tr-modif="' + esc(t.id) + '">Modifier</button>'
+        + (t.statut === 'fait' ? '<button type="button" class="btn second petit" data-tr-rouvrir="' + esc(t.id) + '">Rouvrir</button>' : '')
+        + '</div>';
+    });
+    return h + '</div>';
+  }
+
+  function fenetreTravailAdmin(t) {
+    var actifs = A.init.chantiers.filter(function (c) { return c.actif || c.id === t.chantier; });
+    var voile = el('<div class="voile"></div>');
+    var f = el('<div class="fenetre"></div>');
+    f.innerHTML = '<h2>Modifier le travail</h2><div class="sous">' + esc(t.statut === 'fait' ? 'Fait' : 'À faire') + '</div>'
+      + '<label class="champ"><span>Le travail</span><textarea data-mt-texte rows="2" maxlength="200">' + esc(t.texte) + '</textarea></label>'
+      + '<label class="champ"><span>Chantier</span><select data-mt-chantier>' + actifs.map(function (c) { return '<option value="' + esc(c.id) + '"' + (c.id === t.chantier ? ' selected' : '') + '>' + esc(c.nom) + '</option>'; }).join('') + '</select></label>'
+      + '<div class="pied"><button type="button" class="btn second" data-annuler>Annuler</button><button type="button" class="btn" data-ok>Enregistrer</button></div>'
+      + '<div style="text-align:center;margin-top:6px"><button type="button" class="lien-btn" data-supprimer>Supprimer ce travail</button></div>';
+    voile.appendChild(f);
+    document.body.appendChild(voile);
+    var fermer = function () { voile.remove(); };
+    f.addEventListener('click', function (e) {
+      var b = e.target.closest('button');
+      if (!b) return;
+      if (b.hasAttribute('data-annuler')) { fermer(); return; }
+      if (b.hasAttribute('data-supprimer')) {
+        if (b.getAttribute('data-confirme') !== '1') { b.setAttribute('data-confirme', '1'); b.textContent = 'Confirmer : supprimer ce travail de la liste'; return; }
+        fermer(); actionAdmin(api('admin.travail', { id: t.id, supprimer: true }), 'Travail supprimé'); return;
+      }
+      if (b.hasAttribute('data-ok')) {
+        var texte = f.querySelector('[data-mt-texte]').value.trim();
+        if (!texte) return;
+        fermer(); actionAdmin(api('admin.travail', { id: t.id, texte: texte, chantier: f.querySelector('[data-mt-chantier]').value }), 'Enregistré ✓');
+      }
+    });
   }
 
   /** Heures faites (réel saisi) sur chaque chantier pendant la semaine affichée, salarié par salarié. */
@@ -1636,6 +2099,19 @@
       setTimeout(function () { window.print(); }, 300);
       return;
     }
+    if (b.hasAttribute('data-tr-ajout')) {
+      var tt = valeur('[data-tr-texte]').trim(), tc = valeur('[data-tr-chantier]');
+      if (!tt || !tc) { toast('Décrivez le travail et choisissez le chantier.'); return; }
+      b.disabled = true;
+      actionAdmin(api('admin.travail', { texte: tt, chantier: tc }), 'Travail ajouté ✓');
+      return;
+    }
+    if (b.hasAttribute('data-tr-modif')) {
+      var tm = (A.init.travaux || []).filter(function (x) { return x.id === b.getAttribute('data-tr-modif'); })[0];
+      if (tm) fenetreTravailAdmin(tm);
+      return;
+    }
+    if (b.hasAttribute('data-tr-rouvrir')) { b.disabled = true; actionAdmin(api('admin.travail', { id: b.getAttribute('data-tr-rouvrir'), rouvrir: true }), 'Travail remis dans la liste'); return; }
     if (b.hasAttribute('data-jourmobile')) { A.jourMobile = b.getAttribute('data-jourmobile'); dessinerAdmin(); return; }
     if (b.hasAttribute('data-onglet')) { A.onglet = b.getAttribute('data-onglet'); dessinerAdmin(); chargerMoisSiBesoin(); return; }
     if (b.hasAttribute('data-mois')) {

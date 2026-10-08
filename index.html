@@ -103,6 +103,7 @@
   .ap-case { width: 100%; min-height: 48px; padding: 4px 2px; border: 1px solid var(--bord); border-radius: 6px; background: #fff;
     font-size: 10px; font-weight: 700; line-height: 1.2; text-align: center; overflow-wrap: normal; hyphens: auto; -webkit-hyphens: auto; }
   .ap-case.auj { border: 1.5px solid var(--rouge); }
+  .ap-case.reel { background: var(--fond-reel); border-color: #BCD4EC; color: #2F5E8E; }
   .ap-case.heures { min-height: 36px; font-weight: 500; font-size: 11px; font-variant-numeric: tabular-nums; }
   .moitie { padding: 2px 0 6px; }
   .moitie.suite { border-top: 1px dashed var(--bord); padding-top: 8px; }
@@ -530,7 +531,7 @@
       .catch(function (e) { erreurPage(e.message); });
   }
 
-  function fusionner(per, r) {
+  function fusionner(per, r, sansConfirmes) {
     var disjoint = r.du > plusJours(per.au, 1) || r.au < plusJours(per.du, -1);
     var garder = function (x) { return !disjoint && (x.date < r.du || x.date > r.au); };
     per.prevu = per.prevu.filter(garder).concat(r.prevu);
@@ -540,7 +541,9 @@
     if (r.aujourdhui) per.aujourdhui = r.aujourdhui;
     if (r.limite) per.limite = r.limite;
     // Ce qui a été saisi pendant la session reste affiché tel que saisi
+    // (sauf au rafraîchissement : Google a déjà ce qui est confirmé, et une saisie plus récente doit l'emporter)
     Object.keys(ENVOIS).forEach(function (k) {
+      if (sansConfirmes && ENVOIS[k].etat === 'ok') return;
       var x = k.split('|');
       appliquerLocal(per[x[0]], x[1], [x[2]], ENVOIS[k].lignes);
     });
@@ -570,6 +573,7 @@
   // 'type|salarié|date' → { etat: 'envoi' | 'ok' | 'erreur', lignes, message }
   var ENVOIS = {};
   var fileEnvois = Promise.resolve();
+  var envoisEnCours = 0;
 
   function etatEnvoi(type, sal, date) {
     var e = ENVOIS[type + '|' + sal + '|' + date];
@@ -588,14 +592,17 @@
       appliquerLocal(o.per[o.type], sal, o.dates, o.lignes);
     });
     cles.forEach(function (k) { ENVOIS[k] = { etat: 'envoi', lignes: o.lignes }; });
+    envoisEnCours++;
     o.redessiner();
     fileEnvois = fileEnvois.then(function () {
       return api(o.action, o.donnees).then(function (rep) {
+        envoisEnCours--;
         cles.forEach(function (k) { if (ENVOIS[k].lignes === o.lignes) ENVOIS[k].etat = 'ok'; });
         if (o.apres) o.apres(rep);
         o.redessiner();
         toast('Enregistré ✓');
       }, function (err) {
+        envoisEnCours--;
         cles.forEach(function (k) { if (ENVOIS[k].lignes === o.lignes) { ENVOIS[k].etat = 'erreur'; ENVOIS[k].message = err.message; } });
         o.redessiner();
         toast('Non enregistré : ' + err.message);
@@ -981,17 +988,20 @@
     }).join('') + '</tr></thead><tbody>';
     [['Matin', auMatin], ['Aprèm', aLApresMidi]].forEach(function (moment) {
       h += '<tr><th class="moment">' + moment[0] + '</th>' + jours.map(function (dt) {
-        var lignes = (pr[S.id + '|' + dt] || []).filter(moment[1]);
-        return '<td><button type="button" class="ap-case' + (dt === S.aujourdhui ? ' auj' : '') + '" data-detail="' + dt + '" aria-label="Ouvrir le ' + esc(jourLong(dt)) + '">' + texte(lignes) + '</button></td>';
+        // Dès que la demi-journée est saisie, c'est le réel qu'on montre, sur fond bleu (comme l'onglet Planning du bureau)
+        var faites = (re[S.id + '|' + dt] || []).filter(moment[1]);
+        var lignes = faites.length ? faites : (pr[S.id + '|' + dt] || []).filter(moment[1]);
+        return '<td><button type="button" class="ap-case' + (dt === S.aujourdhui ? ' auj' : '') + (faites.length ? ' reel' : '') + '" data-detail="' + dt + '" aria-label="Ouvrir le ' + esc(jourLong(dt)) + '">' + texte(lignes) + '</button></td>';
       }).join('') + '</tr>';
     });
     // Heures prévues de la journée ; un jour passé pas encore saisi porte « à saisir »
     h += '<tr><th class="moment">Heures</th>' + jours.map(function (dt) {
       var p = pr[S.id + '|' + dt] || [], r = re[S.id + '|' + dt] || [];
       var aSaisir = dt < S.aujourdhui && p.some(function (l) { return l.chantier; }) && !journeeSaisie(p, r);
-      var tp = total(p);
+      // Heures saisies dès qu'il y en a ; sinon les heures prévues
+      var tp = r.length ? total(r) : total(p);
       var t = aSaisir ? 'à saisir' : (tp ? hCourt(tp) : '<span class="vide">·</span>');
-      return '<td><button type="button" class="ap-case heures' + (dt === S.aujourdhui ? ' auj' : '') + (aSaisir ? ' asais' : '') + '" data-detail="' + dt + '" aria-label="Ouvrir le ' + esc(jourLong(dt)) + '">' + t + '</button></td>';
+      return '<td><button type="button" class="ap-case heures' + (dt === S.aujourdhui ? ' auj' : '') + (aSaisir ? ' asais' : '') + (r.length && !aSaisir ? ' reel' : '') + '" data-detail="' + dt + '" aria-label="Ouvrir le ' + esc(jourLong(dt)) + '">' + t + '</button></td>';
     }).join('') + '</tr>';
     return h + '</tbody></table>';
   }
@@ -1461,6 +1471,45 @@
     dessinerAdmin();
     chargerMoisSiBesoin();
   }
+
+  /**
+   * Écran du bureau : les heures saisies par les salariés arrivent toutes seules, sans recharger la page.
+   * Google est interrogé toutes les 20 secondes et dès qu'on revient sur l'onglet ; l'écran n'est redessiné
+   * que si quelque chose a changé, et jamais pendant qu'une fenêtre est ouverte, qu'on tape ou qu'un envoi part.
+   */
+  var RAFRAICHIR_MS = 20000;
+  var rafraichEnCours = false;
+  function empreinte(per, du, au) {
+    return ['prevu', 'reel'].map(function (t) {
+      return per[t].filter(function (x) { return x.date >= du && x.date <= au; }).map(function (x) {
+        return [x.date, x.salarie, x.chantier, x.debut, x.fin, x.pause, x.remarque, x.travail || ''].join('~');
+      }).sort().join('|');
+    }).join('#');
+  }
+  function occupe() {
+    var a = document.activeElement;
+    return envoisEnCours > 0 || !!document.querySelector('.voile')
+      || (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName));
+  }
+  function rafraichirBureau() {
+    if (CONF.role !== 'responsable' || !A.d || rafraichEnCours || document.hidden) return;
+    if (A.onglet === 'reglages' || A.onglet === 'travaux' || occupe()) return;
+    rafraichEnCours = true;
+    var du = A.d.du, au = A.d.au;
+    api('admin.semaine', { du: du, au: au }).then(function (r) {
+      rafraichEnCours = false;
+      if (occupe() || A.onglet === 'reglages' || A.onglet === 'travaux') return; // on réessaiera au prochain tour
+      var avant = empreinte(A.d, r.du, r.au);
+      fusionner(A.d, r, true);
+      if (empreinte(A.d, r.du, r.au) === avant) return;
+      var cadre = document.querySelector('.grille-cadre'), gauche = cadre ? cadre.scrollLeft : 0, haut = window.scrollY;
+      dessinerAdmin();
+      var c2 = document.querySelector('.grille-cadre'); if (c2) c2.scrollLeft = gauche;
+      window.scrollTo(0, haut);
+    }, function () { rafraichEnCours = false; /* réseau coupé : on réessaiera au prochain tour */ });
+  }
+  setInterval(rafraichirBureau, RAFRAICHIR_MS);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) rafraichirBureau(); });
 
   // Un envoi qui se termine ne redessine pas l'onglet Réglages : on y perdrait ce qui est en cours de frappe
   function redessinerGrille() { if (A.onglet !== 'reglages' && A.onglet !== 'travaux') dessinerAdmin(); }

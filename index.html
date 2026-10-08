@@ -1312,7 +1312,7 @@
     var t = travailParId(id);
     if (!t) return;
     var jours = [];
-    for (var i = 0; i <= 2; i++) { var dt = plusJours(S.aujourdhui, -i); if (dt >= S.limite) jours.push(dt); }
+    for (var i = 0; i <= 2; i++) jours.push(plusJours(S.aujourdhui, -i)); // raccourcis ; « Autre jour » ouvre tout le passé
     var etat = { date: S.aujourdhui, debut: '', fin: '', termine: true, comm: '' };
     var fen = fenetreSimple('', function (b, fermer) {
       lireT();
@@ -1325,6 +1325,14 @@
         var ligne = { chantier: t.chantier, travail: t.id, debut: etat.debut, fin: etat.fin, pause: 0, remarque: etat.comm.trim() };
         var pb = valider(r.concat([ligne]));
         if (pb) { dessinerT(pb); return; }
+        // Un jour plus ancien que ce qui est chargé : on va d'abord chercher ses heures, pour ne pas les écraser
+        if (etat.date < S.du) {
+          b.disabled = true;
+          api('moi.semaine', { du: lundiDe(etat.date), au: S.au }).then(function (rep) {
+            fusionner(S, rep); b.disabled = false; b.click();
+          }, function (e) { b.disabled = false; dessinerT(e.message); });
+          return;
+        }
         var etats = {}; etats[t.id] = etat.termine ? 'fait' : 'a_faire';
         fermer();
         enregistrerSalarie(etat.date, r.map(function (l) { return { chantier: l.chantier, debut: l.debut, fin: l.fin, pause: l.pause, remarque: l.remarque, travail: l.travail || '' }; }).concat([ligne]), etats);
@@ -1342,6 +1350,7 @@
         + '<div class="bloc-titre">Quel jour ?</div><div class="choix-fini">' + jours.map(function (dt) {
           return '<button type="button" class="' + (dt === etat.date ? 'on' : '') + '" data-tjour="' + dt + '">' + (dt === S.aujourdhui ? 'Aujourd\'hui' : esc(jourCourt(dt))) + '</button>';
         }).join('') + '</div>'
+        + '<label class="champ" style="margin-top:8px"><span>Autre jour</span><input type="date" data-tautre max="' + esc(S.aujourdhui) + '" value="' + (jours.indexOf(etat.date) < 0 ? esc(etat.date) : '') + '"></label>'
         + '<div class="trio deux" style="margin-top:10px"><label class="champ"><span>De</span><input type="text" inputmode="numeric" maxlength="5" placeholder="--:--" data-heure data-tdeb value="' + esc(etat.debut) + '"></label>'
         + '<label class="champ"><span>À</span><input type="text" inputmode="numeric" maxlength="5" placeholder="--:--" data-heure data-tfin value="' + esc(etat.fin) + '"></label></div>'
         + '<div class="choix-fini"><button type="button" class="' + (etat.termine ? 'on' : '') + '" data-tfini="x|1">Terminé</button><button type="button" class="' + (!etat.termine ? 'on' : '') + '" data-tfini="x|0">Pas fini</button></div>'
@@ -1350,6 +1359,14 @@
         + '<div class="pied"><button type="button" class="btn second" data-annuler>Annuler</button><button type="button" class="btn" data-ok>Enregistrer</button></div>';
       f.innerHTML = h;
     }
+    f.addEventListener('change', function (e) {
+      if (!e.target.hasAttribute || !e.target.hasAttribute('data-tautre')) return;
+      var v = e.target.value;
+      if (!/^\d{4}-\d\d-\d\d$/.test(v)) return;
+      lireT();
+      if (v > S.aujourdhui) { dessinerT('On ne peut pas saisir un jour qui n’est pas encore passé.'); return; }
+      etat.date = v; dessinerT();
+    });
     f.addEventListener('focusin', function (e) { if (e.target.hasAttribute && e.target.hasAttribute('data-heure')) setTimeout(function () { e.target.select(); }, 0); });
     f.addEventListener('focusout', function (e) { if (e.target.hasAttribute && e.target.hasAttribute('data-heure')) { var h = lireHeure(e.target.value); if (h) e.target.value = h; } });
     dessinerT();

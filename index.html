@@ -466,7 +466,7 @@
     return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
   }
   function min(h) { var p = String(h).split(':'); return Number(p[0]) * 60 + Number(p[1]); }
-  function duree(l) { return l.chantier ? Math.max(0, min(l.fin) - min(l.debut) - (Number(l.pause) || 0)) : 0; }
+  function duree(l) { return l.chantier && l.fin ? Math.max(0, min(l.fin) - min(l.debut) - (Number(l.pause) || 0)) : 0; }
   function total(lignes) { return lignes.reduce(function (s, l) { return s + duree(l); }, 0); }
   function fh(m) { var h = Math.floor(Math.abs(m) / 60), r = Math.abs(m) % 60; return h + 'h' + (r < 10 ? '0' : '') + r; }
   function hCourt(m) { var r = m % 60; return Math.floor(m / 60) + 'h' + (r ? (r < 10 ? '0' : '') + r : ''); }
@@ -506,8 +506,8 @@
 
       return '<div class="creneau"><div class="ch">' + esc(nom) + '</div>'
         + (avecAdresse && c && c.adresse ? '<div class="adr">' + esc(c.adresse) + '</div>' : '')
-        + '<div class="h">' + heure(l.debut) + ' → ' + heure(l.fin) + '</div>'
-        + '<div class="h">' + (l.pause ? 'pause ' + fh(l.pause) + ' · ' : '') + '<b>' + fh(duree(l)) + '</b></div>'
+        + '<div class="h">' + heure(l.debut) + ' → ' + (l.fin ? heure(l.fin) : '<i>fin à saisir</i>') + '</div>'
+        + '<div class="h">' + (l.pause ? 'pause ' + fh(l.pause) + (l.fin ? ' · ' : '') : '') + (l.fin ? '<b>' + fh(duree(l)) + '</b>' : '') + '</div>'
         + (l.remarque && !sansRemarque ? '<div class="comm">' + esc(l.remarque) + '</div>' : '') + '</div>';
     }).join('');
   }
@@ -615,10 +615,12 @@
     // Créneaux de chantier et absences d'une demi-journée (qui ont des heures) ne doivent pas se chevaucher
     var tri = lignes.filter(function (l) { return l.debut; }).slice().sort(function (a, b) { return min(a.debut) - min(b.debut); });
     for (var i = 0; i < tri.length; i++) {
+      if (i && min(tri[i].debut) < min(tri[i - 1].fin)) return 'Deux créneaux se chevauchent : ' + tri[i - 1].debut + '–' + tri[i - 1].fin + ' et ' + tri[i].debut + '–' + tri[i].fin + '.';
+      // Créneau encore ouvert (fin vide) : permis seulement en dernier
+      if (!tri[i].fin) { if (i < tri.length - 1) return 'Il manque l\'heure de fin du créneau de ' + heure(tri[i].debut) + ' : mets-la avant d\'en ajouter un autre.'; continue; }
       var dur = min(tri[i].fin) - min(tri[i].debut);
       if (dur <= 0) return 'L\'heure de fin doit être après l\'heure de début.';
       if (tri[i].chantier && (Number(tri[i].pause) || 0) >= dur) return 'La pause est plus longue que le créneau.';
-      if (i && min(tri[i].debut) < min(tri[i - 1].fin)) return 'Deux créneaux se chevauchent : ' + tri[i - 1].debut + '–' + tri[i - 1].fin + ' et ' + tri[i].debut + '–' + tri[i].fin + '.';
     }
     return '';
   }
@@ -826,6 +828,7 @@
   function chantiersS() { var m = {}; S.chantiers.forEach(function (c) { m[c.id] = c; }); return m; }
   function nomChantier(id, chantiers, secours) { return chantiers[id] ? chantiers[id].nom : (secours || 'Chantier'); }
   function lundiDe(s) { var j = d(s).getUTCDay(); return plusJours(s, j === 0 ? -6 : 1 - j); }
+  function ouvert(l) { return !!(l.chantier && l.debut && !l.fin); } // arrivée pointée, fin pas encore mise
   function passeMidi(l) { return l.chantier && l.debut && min(l.debut) < 12 * 60 && min(l.fin) > 12 * 60; }
   function travauxOuverts() { return (S.travaux || []).filter(function (t) { return t.statut !== 'fait'; }); }
   function travailParId(id) { return (S.travaux || []).filter(function (t) { return t.id === id; })[0]; }
@@ -915,6 +918,7 @@
     var etiquette = '';
     if (ev === 'envoi') etiquette = '<span class="etiquette attente">Envoi…</span>';
     else if (ev === 'erreur') etiquette = '<span class="etiquette manque">Non enregistré</span>';
+    else if (r.some(ouvert)) etiquette = '<span class="etiquette attente">Fin à saisir</span>';
     else if (r.length && complet) etiquette = '<span class="etiquette ok">Saisi</span>';
     else if (faits.length) {
       etiquette = '<span class="etiquette ' + (auj ? 'attente' : 'manque') + '">' + (faits[0] ? 'Matin saisi · après-midi ' : 'Après-midi saisi · matin ')
@@ -947,7 +951,7 @@
       if (modifiable) {
         var nomM = m ? 'le matin' : 'l\'après-midi';
         h += '<div class="actions-jour"><button type="button" class="btn ' + (gr.length ? 'second ' : '') + 'plein" data-moment="' + date + '|' + (m ? 'm' : 'a') + '">'
-          + (gr.length ? 'Corriger ' : 'Saisir ') + nomM + '</button></div>';
+          + (gr.some(ouvert) ? 'Mettre l\'heure de fin' : (gr.length ? 'Corriger ' : 'Saisir ') + nomM) + '</button></div>';
       }
       h += '</div>';
     });
@@ -1000,7 +1004,7 @@
       var aSaisir = dt < S.aujourdhui && p.some(function (l) { return l.chantier; }) && !journeeSaisie(p, r);
       // Heures saisies dès qu'il y en a ; sinon les heures prévues
       var tp = r.length ? total(r) : total(p);
-      var t = aSaisir ? 'à saisir' : (tp ? hCourt(tp) : '<span class="vide">·</span>');
+      var t = aSaisir ? 'à saisir' : (r.some(ouvert) ? 'en cours' : (tp ? hCourt(tp) : '<span class="vide">·</span>'));
       return '<td><button type="button" class="ap-case heures' + (dt === S.aujourdhui ? ' auj' : '') + (aSaisir ? ' asais' : '') + (r.length && !aSaisir ? ' reel' : '') + '" data-detail="' + dt + '" aria-label="Ouvrir le ' + esc(jourLong(dt)) + '">' + t + '</button></td>';
     }).join('') + '</tr>';
     return h + '</tbody></table>';
@@ -1050,7 +1054,7 @@
         var t = l.travail ? travailParId(l.travail) : null;
         var nom = l.chantier ? (t ? t.texte + ' (' + nomChantier(l.chantier, chantiers, l.chantierNom) + ')' : nomChantier(l.chantier, chantiers, l.chantierNom)) : (l.remarque || 'Absent');
         return '<div class="comm-lecture"><b>' + esc(nom) + '</b>'
-          + (l.chantier ? heure(l.debut) + ' → ' + heure(l.fin) + (l.pause ? ', pause ' + fh(l.pause) : '') + ' = ' + fh(duree(l)) : '')
+          + (l.chantier ? heure(l.debut) + ' → ' + (l.fin ? heure(l.fin) + (l.pause ? ', pause ' + fh(l.pause) : '') + ' = ' + fh(duree(l)) : 'fin à saisir') : '')
           + (l.chantier && l.remarque ? '<div class="comm">' + esc(l.remarque) + '</div>' : '') + '</div>';
       }).join('');
     }
@@ -1164,7 +1168,7 @@
             + (i > 0 ? '<button type="button" class="lien-btn" data-retirer="' + i + '">Retirer ce créneau</button>' : '')
             + '</div>';
         });
-        h += '<div class="aide-heure">Tapez l\'heure au clavier : 0830 pour 8h30.' + (listeTravaux.length ? ' À laisser vide si tu n\'as fait que des travaux en attente.' : '') + '</div>'
+        h += '<div class="aide-heure">Tapez l\'heure au clavier : 0830 pour 8h30. Pas encore fini ? Laisse la fin vide et reviens la mettre en partant.' + (listeTravaux.length ? ' À laisser vide si tu n\'as fait que des travaux en attente.' : '') + '</div>'
           + '<button type="button" class="lien-btn" data-ajouter>+ Un autre créneau</button></div>';
         if (listeTravaux.length) {
           var nbCoches = Object.keys(faits).length;
@@ -1221,7 +1225,7 @@
         if (vide && i === 0 && Object.keys(faits).length) continue; // seulement des travaux en attente
         if (vide && i === 0) return { erreur: 'Indique tes heures, ou coche un travail en attente fait.' };
         if (!c.chantier) return { erreur: 'Choisis le chantier.' };
-        if (!heureOk(c.debut) || !heureOk(c.fin)) return { erreur: 'Heure illisible : tape par exemple 0830 pour 8h30.' };
+        if (!heureOk(c.debut) || (c.fin && !heureOk(c.fin))) return { erreur: 'Heure illisible : tape par exemple 0830 pour 8h30.' };
         lignes.push({ chantier: c.chantier, debut: c.debut, fin: c.fin, pause: c.pause, remarque: '' });
       }
       var etats = {};
@@ -1842,7 +1846,7 @@
       + reelJour.slice().sort(function (a, b) { return String(a.debut).localeCompare(String(b.debut)); }).map(function (l) {
         var nom = l.chantier ? (ch[l.chantier] ? ch[l.chantier].nom : l.chantierNom) : (l.remarque || 'Absent');
         return '<div class="comm-lecture"><b>' + esc(nom) + '</b>'
-          + (l.chantier ? heure(l.debut) + ' → ' + heure(l.fin) + (l.pause ? ', pause ' + fh(l.pause) : '') + ' = ' + fh(duree(l)) : '')
+          + (l.chantier ? heure(l.debut) + ' → ' + (l.fin ? heure(l.fin) + (l.pause ? ', pause ' + fh(l.pause) : '') + ' = ' + fh(duree(l)) : 'fin à saisir') : '')
           + (l.chantier && l.remarque ? '<div class="comm">' + esc(l.remarque) + '</div>' : '') + '</div>';
       }).join('')
       + '<button type="button" class="btn second petit" style="margin-top:8px" data-corriger-reel>Corriger ces heures</button></div>'
@@ -1891,10 +1895,10 @@
   }
 
   /** « 08:00 » → « 8h », « 12:30 » → « 12h30 » : les cases sont étroites. */
-  function hc(h) { var x = String(h).split(':'); return Number(x[0]) + 'h' + (x[1] && x[1] !== '00' ? x[1] : ''); }
+  function hc(h) { if (!h) return '…'; var x = String(h).split(':'); return Number(x[0]) + 'h' + (x[1] && x[1] !== '00' ? x[1] : ''); }
   // Une absence de toute la journée (sans heures) compte pour le matin et l'après-midi
   function auMatin(l) { return !l.debut || min(l.debut) < 12 * 60; }
-  function aLApresMidi(l) { return !l.debut || min(l.fin) > 12 * 60; }
+  function aLApresMidi(l) { return !l.debut || (l.fin ? min(l.fin) > 12 * 60 : min(l.debut) >= 12 * 60); } // sans fin : selon l'arrivée
   function dansMoment(l, matin) { return matin ? auMatin(l) : aLApresMidi(l); }
   /**
    * Créneaux à montrer pour le matin ou l'après-midi. Un créneau qui commence avant 12h et finit après
@@ -1918,7 +1922,9 @@
     return lignes.map(function (l) {
       if (!l.chantier) return '<div class="ch">' + esc(l.remarque || 'Absent') + '</div>';
       var nom = ch[l.chantier] ? ch[l.chantier].nom : l.chantierNom;
-      return '<div class="ch">' + esc(nom) + '</div><div class="h">' + hc(l.debut) + '–<wbr>' + hc(l.fin) + '</div>'
+      // Fin pas encore mise : « en cours » le jour même, « fin manquante » en rose ensuite (écran du bureau seulement)
+      var fin = l.fin ? hc(l.fin) : (l.date && A.d && l.date < A.d.aujourdhui ? '<span class="txt-neg">fin manquante</span>' : 'en cours');
+      return '<div class="ch">' + esc(nom) + '</div><div class="h">' + hc(l.debut) + '–<wbr>' + fin + '</div>'
         + (l.pause ? '<div class="h">pause ' + hCourt(l.pause) + '</div>' : '');
     }).join('');
   }

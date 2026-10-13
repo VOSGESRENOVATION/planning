@@ -45,6 +45,9 @@
   header.bandeau .soc { font-weight: 700; font-size: 18px; }
   header.bandeau .quoi { opacity: .85; font-size: 15px; }
   header.bandeau .qui { margin-left: auto; font-size: 15px; opacity: .9; }
+  /* Dates des versions (page et Google), sur téléphone seulement */
+  .version { display: none; font-size: 11px; color: var(--gris); text-align: center; padding: 3px 8px 0; }
+  @media (max-width: 760px) { .version { display: block; } }
 
   main { max-width: 1480px; margin: 0 auto; padding: 16px; }
   .etroit { max-width: 560px; }
@@ -108,8 +111,8 @@
   .moitie { padding: 2px 0 6px; }
   .moitie.suite { border-top: 1px dashed var(--bord); padding-top: 8px; }
   /* ---------- Salarié : onglets, à venir, travaux, mes heures ---------- */
-  .onglets-s { display: grid; grid-template-columns: 1.15fr 1fr 1fr; margin: -16px -16px 12px; background: #fff; border-bottom: 1px solid var(--bord); position: sticky; top: 0; z-index: 5; }
-  .onglet-s { background: none; border: 0; border-bottom: 3px solid transparent; padding: 13px 4px; font-size: 15px; font-weight: 500; color: var(--gris); min-height: 48px; }
+  .onglets-s { display: grid; grid-template-columns: 1.25fr 1fr 1fr 1fr; margin: -16px -16px 12px; background: #fff; border-bottom: 1px solid var(--bord); position: sticky; top: 0; z-index: 5; }
+  .onglet-s { background: none; border: 0; border-bottom: 3px solid transparent; padding: 13px 2px; font-size: 14px; font-weight: 500; color: var(--gris); min-height: 48px; }
   .onglet-s.actif { color: var(--rouge); font-weight: 700; border-bottom-color: var(--rouge); }
   .onglet-s .nb, .replie .nb { display: inline-block; background: var(--rouge); color: #fff; font-size: 11px; font-weight: 700; border-radius: 10px; padding: 0 7px; margin-left: 3px; }
   .astuce { font-size: 13px; color: var(--gris); margin: -6px 2px 10px; }
@@ -357,7 +360,7 @@
     table.impr .hj { font-weight: 700; font-size: 8px; margin-top: 1px; }
     * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     html, body { background: #fff; }
-    header.bandeau, .onglets, .barre, #toast, .voile { display: none !important; }
+    header.bandeau, .version, .onglets, .barre, #toast, .voile { display: none !important; }
     main { max-width: none; padding: 0; }
     .titre-impression { display: block; font-size: 15px; font-weight: 700; margin: 0 0 6px; }
     .grille-cadre { overflow: visible; }
@@ -386,6 +389,7 @@
   <span class="quoi" id="quoi">Planning chantiers</span>
   <span class="qui" id="qui"></span>
 </header>
+<div class="version" id="version"></div>
 <div id="etat" class="etat"></div>
 <main id="app"><div class="chargement">Chargement…</div></main>
 <div id="toast"></div>
@@ -713,11 +717,14 @@
       if (message) h += '<div class="erreur-saisie">' + esc(message) + '</div>';
       h += '<div class="pied"><button type="button" class="btn second" data-annuler>Annuler</button><button type="button" class="btn" data-ok>' + esc(o.libelleOk || 'Enregistrer') + '</button></div>';
       if (o.peutEffacer) h += '<div style="text-align:center;margin-top:6px"><button type="button" class="lien-btn" data-effacer>' + esc(o.libelleEffacer || 'Effacer cette journée') + '</button></div>';
+      // Bureau : tout vider (prévu et heures saisies), sans avoir à choisir de chantier. Deuxième clic pour confirmer.
+      if (o.reinitialiser) h += '<button type="button" class="btn second plein" style="margin-top:10px;color:var(--rouge);border-color:var(--rouge)" data-reinit>'
+        + (confirmeReinit ? 'Confirmer : effacer le prévu et les heures saisies de ce jour' : 'Réinitialiser cette journée') + '</button>';
       f.innerHTML = h;
       majDurees();
     }
 
-    var joursCoches = {}, salCoches = {};
+    var joursCoches = {}, salCoches = {}, confirmeReinit = false;
     function lireCoches() {
       f.querySelectorAll('[data-jour]').forEach(function (c) { joursCoches[c.getAttribute('data-jour')] = c.checked; });
       f.querySelectorAll('[data-sal]').forEach(function (c) { salCoches[c.getAttribute('data-sal')] = c.checked; });
@@ -772,6 +779,10 @@
       if (b.hasAttribute('data-ajouter')) { lireChamps(); lignes.push(ligneVide(lignes[lignes.length - 1])); dessiner(); return; }
       if (b.hasAttribute('data-retirer')) { lireChamps(); lignes.splice(Number(b.getAttribute('data-retirer')), 1); dessiner(); return; }
       if (b.hasAttribute('data-effacer')) { validerEtFermer([]); return; }
+      if (b.hasAttribute('data-reinit')) {
+        if (!confirmeReinit) { lireChamps(); confirmeReinit = true; dessiner(); return; }
+        fermer(); o.reinitialiser(); return;
+      }
       if (b.hasAttribute('data-ok')) {
         lireChamps();
         var a_envoyer;
@@ -809,7 +820,7 @@
   // ------------------------------------------------------------------------------------------
   var S = null;            // données chargées : { id, nom, aujourdhui, limite, chantiers, collegues, du, au, prevu, reel, travaux }
   var lundiAffiche = null;
-  var ongletS = 'planning'; // 'planning' | 'travaux' | 'heures'
+  var ongletS = 'planning'; // 'planning' | 'travaux' | 'heures' | 'chantiers'
 
   function salarie(r) {
     document.getElementById('quoi').textContent = 'Planning';
@@ -858,11 +869,12 @@
   // ------------------------------------------------------------------ onglets du salarié
   function dessinerSalarie() {
     var n = travauxOuverts().length;
-    var h = '<div class="onglets-s">' + [['planning', 'Mon planning'], ['travaux', 'Travaux' + (n ? ' <span class="nb">' + n + '</span>' : '')], ['heures', 'Mes heures']].map(function (o) {
+    var h = '<div class="onglets-s">' + [['planning', 'Mon planning'], ['travaux', 'Travaux' + (n ? ' <span class="nb">' + n + '</span>' : '')], ['heures', 'Mes heures'], ['chantiers', 'Chantiers']].map(function (o) {
       return '<button type="button" class="onglet-s' + (ongletS === o[0] ? ' actif' : '') + '" data-onglet-s="' + o[0] + '">' + o[1] + '</button>';
     }).join('') + '</div>';
     if (ongletS === 'travaux') h += htmlTravauxS();
     else if (ongletS === 'heures') h += htmlMesHeures();
+    else if (ongletS === 'chantiers') h += htmlChantiersS();
     else h += htmlPlanningS();
     app.innerHTML = h;
   }
@@ -1395,6 +1407,35 @@
       });
   }
 
+  // ------------------------------------------------------------------ onglet « Chantiers »
+  /** La liste des chantiers en cours, et de quoi en créer un qui manque (il entre directement, comme un travail). */
+  function htmlChantiersS() {
+    var actifs = S.chantiers.filter(function (c) { return c.actif; })
+      .sort(function (a, b) { return String(a.nom).localeCompare(String(b.nom), 'fr'); });
+    var h = '<div class="astuce" style="margin-top:4px">Il manque un chantier ? Crée-le : il s\'ajoute à la liste de tout le monde.</div>'
+      + '<button type="button" class="btn second plein" data-nouveau-chantier style="margin-bottom:10px">+ Créer un chantier</button>';
+    if (!actifs.length) return h + '<div class="message info">Aucun chantier pour l\'instant.</div>';
+    return h + '<div class="bloc-h"><div class="bloc-titre">Chantiers en cours (' + actifs.length + ')</div>' + actifs.map(function (c) {
+      return '<div class="ligne-h"><span><b>' + esc(c.nom) + '</b>' + (c.adresse ? '<br><small style="color:var(--gris)">' + esc(c.adresse) + '</small>' : '') + '</span></div>';
+    }).join('') + '</div>';
+  }
+
+  function ouvrirNouveauChantier() {
+    fenetreSimple('<h2>Créer un chantier</h2><div class="sous">Il s\'ajoute à la liste de tout le monde.</div>'
+      + '<label class="champ"><span>Nom du chantier</span><input type="text" data-cnom maxlength="120" placeholder="Ex. : DUPONT Xertigny"></label>'
+      + '<label class="champ"><span>Adresse (facultatif)</span><input type="text" data-cadresse maxlength="200"></label>'
+      + '<div class="erreur-saisie" data-cerr></div>'
+      + '<div class="pied"><button type="button" class="btn second" data-fermer>Annuler</button><button type="button" class="btn" data-ok>Créer</button></div>',
+      function (b, fermer, f) {
+        if (!b.hasAttribute('data-ok')) return;
+        var nom = f.querySelector('[data-cnom]').value.trim(), adresse = f.querySelector('[data-cadresse]').value.trim();
+        if (!nom) { f.querySelector('[data-cerr]').textContent = 'Indique le nom du chantier.'; return; }
+        b.disabled = true;
+        api('moi.chantier', { nom: nom, adresse: adresse }).then(function (r) {
+          S.chantiers = r.chantiers; fermer(); dessinerSalarie(); toast('Chantier créé ✓');
+        }).catch(function (e) { b.disabled = false; f.querySelector('[data-cerr]').textContent = e.message; });
+      });
+  }
   // ------------------------------------------------------------------ onglet « Mes heures »
   function htmlMesHeures() {
     var re = parJour(S.reel), pr = parJour(S.prevu);
@@ -1473,6 +1514,7 @@
     if (b.hasAttribute('data-detail')) { ouvrirDetail(b.getAttribute('data-detail')); return; }
     if (b.hasAttribute('data-tache')) { ouvrirTache(b.getAttribute('data-tache')); return; }
     if (b.hasAttribute('data-proposer')) { ouvrirProposer(); return; }
+    if (b.hasAttribute('data-nouveau-chantier')) { ouvrirNouveauChantier(); return; }
   });
 
   // ------------------------------------------------------------------------------------------
@@ -1875,6 +1917,13 @@
       joursSupp: estPrevu ? joursAffiches().filter(function (j) { return j !== date; }) : null,
       autresSalaries: estPrevu ? A.init.salaries.filter(function (x) { return x.actif && x.id !== sal.id; }) : null,
       peutEffacer: existant.length > 0,
+      // Vide le prévu et le réel de ce salarié pour ce jour (ex. heures de test)
+      reinitialiser: prevuJour.length || reelJour.length ? function () {
+        if (prevuJour.length) envoyer({ type: 'prevu', per: A.d, sals: [sal.id], dates: [date], lignes: [], action: 'admin.prevu',
+          donnees: { salaries: [sal.id], dates: [date], lignes: [] }, redessiner: redessinerGrille });
+        if (reelJour.length) envoyer({ type: 'reel', per: A.d, sals: [sal.id], dates: [date], lignes: [], action: 'admin.reel',
+          donnees: { salarie: sal.id, date: date, lignes: [] }, redessiner: redessinerGrille });
+      } : null,
       enregistrer: function (lignes, coches, autres) {
         var dates = estPrevu ? [date].concat(coches || []) : [date];
         var sals = estPrevu ? [sal.id].concat(autres || []) : [sal.id];
@@ -2274,6 +2323,13 @@
     b.textContent = texte || '';
     b.className = 'etat' + (texte ? ' visible' : '') + (horsLigne ? ' hors' : '');
   }
+  // Date de cette version de la page : à changer à chaque modification (même date que VERSION dans Code.gs quand les deux changent)
+  var VERSION_PAGE = '13/10/2026 10h30';
+  function montrerVersion(google) {
+    var v = document.getElementById('version');
+    if (v) v.textContent = 'Page du ' + VERSION_PAGE + ' · Google ' + (google === undefined ? '…' : google ? 'du ' + google : 'ancienne version');
+  }
+  montrerVersion();
   function afficher(r) { CONF.role = r.role; if (r.role === 'salarie') salarie(r); else responsable(r); }
 
   if (!CONF.code) erreurPage('Ce lien n\'est pas valable. Demandez votre lien personnel au bureau.');
@@ -2285,6 +2341,7 @@
     api('demarrer').then(function (r) {
       ecrireLocal(r);
       afficher(r);
+      montrerVersion(r.version || '');
       etat('');
     }).catch(function (e) {
       if (memo && !/lien/.test(e.message)) {

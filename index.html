@@ -1882,8 +1882,13 @@
   }
 
   /** Heures saisies par le salarié, en lecture, avec un bouton pour les corriger. */
-  function htmlReelLecture(sal, reelJour, ch) {
-    if (!reelJour.length) return '';
+  function htmlReelLecture(sal, reelJour, ch, passe) {
+    // Jour passé sans heures saisies : le responsable peut les saisir à la place du salarié
+    if (!reelJour.length) return passe
+      ? '<div class="info-lecture"><div class="bloc-titre">Heures réelles</div><div class="note">' + esc(sal.nom.split(' ')[0]) + ' n’a pas saisi ses heures ce jour-là.</div>'
+        + '<button type="button" class="btn petit" style="margin-top:8px" data-corriger-reel>Saisir ses heures réelles à sa place</button></div>'
+        + '<div class="bloc-titre" style="margin:4px 0 6px">Planning prévu</div>'
+      : '';
     return '<div class="info-lecture"><div class="bloc-titre">Heures saisies par ' + esc(sal.nom.split(' ')[0]) + '</div>'
       + reelJour.slice().sort(function (a, b) { return String(a.debut).localeCompare(String(b.debut)); }).map(function (l) {
         var nom = l.chantier ? (ch[l.chantier] ? ch[l.chantier].nom : l.chantierNom) : (l.remarque || 'Absent');
@@ -1911,7 +1916,7 @@
       titre: (estPrevu ? 'Planning de ' : 'Heures réelles de ') + sal.nom, date: date, lignes: depart,
       chantiers: A.init.chantiers,
       libelleRemarque: estPrevu ? 'Consignes pour ce chantier (une par ligne)' : 'Commentaire du salarié',
-      infoHaut: estPrevu ? htmlReelLecture(sal, reelJour, ch) : htmlTextes('Consignes données', prevuJour, ch),
+      infoHaut: estPrevu ? htmlReelLecture(sal, reelJour, ch, date <= A.d.aujourdhui) : htmlTextes('Consignes données', prevuJour, ch),
       corrigerReel: date <= A.d.aujourdhui ? function () { ouvrirJourAdmin(false, salId, date); } : null,
       libelleAbsence: estPrevu ? 'Absent ce jour-là (congé, formation…)' : 'N\'a pas travaillé ce jour-là',
       joursSupp: estPrevu ? joursAffiches().filter(function (j) { return j !== date; }) : null,
@@ -2324,7 +2329,7 @@
     b.className = 'etat' + (texte ? ' visible' : '') + (horsLigne ? ' hors' : '');
   }
   // Date de cette version de la page : à changer à chaque modification (même date que VERSION dans Code.gs quand les deux changent)
-  var VERSION_PAGE = '13/10/2026 10h30';
+  var VERSION_PAGE = '19/10/2026 10h00';
   function montrerVersion(google) {
     var v = document.getElementById('version');
     if (v) v.textContent = 'Page du ' + VERSION_PAGE + ' · Google ' + (google === undefined ? '…' : google ? 'du ' + google : 'ancienne version');

@@ -66,6 +66,15 @@
   .message.erreur { background: var(--rose-pale); color: var(--rose); font-weight: 500; }
   .message.info { background: #fff; border: 1px solid var(--bord); }
   .chargement { color: var(--gris); padding: 30px 0; text-align: center; }
+  /* Chantiers créés par un salarié, à valider ou rattacher par le bureau */
+  .alerte-ch { background: #fff; border: 1.5px solid var(--rouge); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }
+  .alerte-ch h3 { margin: 0 0 4px; font-size: 15px; }
+  .alerte-ch .un-ch { border-top: 1px solid var(--bord); padding-top: 10px; margin-top: 10px; }
+  .alerte-ch .qui { font-size: 13px; color: var(--gris); margin-bottom: 6px; }
+  .alerte-ch .rang-a { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 6px; }
+  .alerte-ch .rang-a input, .alerte-ch .rang-a select { min-height: 38px; padding: 6px 10px; border: 1.5px solid var(--bord); border-radius: 8px; font: inherit; flex: 1 1 180px; min-width: 0; }
+  .alerte-ch .ou { font-size: 13px; color: var(--gris); }
+  @media print { .alerte-ch { display: none; } }
 
   .etat { display: none; text-align: center; font-size: 13px; padding: 5px 16px; background: var(--fond-prevu); color: var(--gris); }
   .etat.visible { display: block; }
@@ -1564,7 +1573,9 @@
       if (occupe() || A.onglet === 'reglages' || A.onglet === 'travaux') return; // on réessaiera au prochain tour
       var avant = empreinte(A.d, r.du, r.au);
       fusionner(A.d, r, true);
-      if (empreinte(A.d, r.du, r.au) === avant) return;
+      var chAvant = JSON.stringify(A.init.chantiers);
+      if (r.chantiers) A.init.chantiers = r.chantiers;
+      if (empreinte(A.d, r.du, r.au) === avant && JSON.stringify(A.init.chantiers) === chAvant) return;
       var cadre = document.querySelector('.grille-cadre'), gauche = cadre ? cadre.scrollLeft : 0, haut = window.scrollY;
       dessinerAdmin();
       var c2 = document.querySelector('.grille-cadre'); if (c2) c2.scrollLeft = gauche;
@@ -1689,12 +1700,35 @@
       + [['planning', 'Planning'], ['reel', 'Prévu / Réel'], ['travaux', 'Travaux'], ['chantiers', 'Chantiers'], ['compteur', 'Compteur'], ['reglages', 'Réglages']].map(function (o) {
         return '<button type="button" class="onglet' + (A.onglet === o[0] ? ' actif' : '') + '" data-onglet="' + o[0] + '">' + o[1] + '</button>';
       }).join('') + '</div>';
+    h += htmlAlerteChantiers();
     if (A.onglet === 'reglages') h += htmlReglages();
     else if (A.onglet === 'compteur') h += htmlCompteur();
     else if (A.onglet === 'chantiers') h += htmlChantiers();
     else if (A.onglet === 'travaux') h += htmlTravauxAdmin();
     else h += htmlGrille(A.onglet);
     app.innerHTML = h;
+  }
+
+  /** Chantiers créés par un salarié : on confirme (nom corrigé au besoin) ou on rattache à un chantier qui existe. */
+  function htmlAlerteChantiers() {
+    var nouveaux = A.init.chantiers.filter(function (c) { return c.aVerifier; });
+    if (!nouveaux.length) return '';
+    var existants = A.init.chantiers.filter(function (c) { return c.actif && !c.aVerifier; })
+      .sort(function (a, b) { return a.nom.localeCompare(b.nom); });
+    var h = '<div class="alerte-ch"><h3>' + (nouveaux.length > 1 ? nouveaux.length + ' nouveaux chantiers créés' : 'Nouveau chantier créé') + ' par un salarié</h3>'
+      + '<div class="note">Les heures saisies dessus sont gardées. Validez-le, ou rattachez-le au chantier qui existe déjà : ses heures et ses travaux y passeront.</div>';
+    nouveaux.forEach(function (c) {
+      var le = c.creeLe ? c.creeLe.slice(8, 10) + '/' + c.creeLe.slice(5, 7) + ' à ' + c.creeLe.slice(11, 16).replace(':', 'h') : '';
+      h += '<div class="un-ch"><div class="qui">Créé par <b>' + esc(c.creePar || '?') + '</b>' + (le ? ' le ' + le : '') + '</div>'
+        + '<div class="rang-a"><input type="text" data-chv-nom="' + c.id + '" value="' + esc(c.nom) + '" aria-label="Nom du chantier">'
+        + '<input type="text" data-chv-adr="' + c.id + '" value="' + esc(c.adresse) + '" placeholder="Adresse" aria-label="Adresse">'
+        + '<button type="button" class="btn petit" data-chv="' + c.id + '">C\'est un nouveau chantier : valider</button></div>'
+        + '<div class="rang-a"><span class="ou">ou c\'est le même que</span><select data-chr-vers="' + c.id + '" aria-label="Chantier existant">'
+        + '<option value="">— Choisir le chantier existant —</option>'
+        + existants.map(function (x) { return '<option value="' + esc(x.id) + '">' + esc(x.nom) + '</option>'; }).join('')
+        + '</select><button type="button" class="btn second petit" data-chr="' + c.id + '">Rattacher</button></div></div>';
+    });
+    return h + '</div>';
   }
 
   var NOMS_MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
@@ -2190,6 +2224,8 @@
     });
     h += '<div class="rang"><input type="text" class="nom-in" data-nouveau="resp" placeholder="Nom"><button type="button" class="btn petit" data-ajout="resp">Ajouter un responsable</button></div></div>';
 
+    h += '<div class="panneau"><h3>Alerte nouveau chantier</h3><p class="aide">Quand un salarié crée un chantier, un mail part à cette adresse. Laissez vide pour n\'avoir que l\'alerte en haut de cet écran.</p>'
+      + '<div class="rang"><input type="text" class="adr-in" data-mail-alerte value="' + esc(A.init.mailAlerte || '') + '" placeholder="prenom@exemple.fr"><button type="button" class="btn second petit" data-maj-mail>Enregistrer</button></div></div>';
     h += '<div class="panneau"><h3>Adresse de la page (site gratuit, sans bandeau bleu)</h3><p class="aide">Quand elle est remplie, les liens des salariés et des responsables pointent vers cette page. Laissez vide pour garder les liens Google.</p>'
       + '<div class="rang"><input type="text" class="adr-in" data-adresse-page value="' + esc(A.init.page || '') + '" placeholder="https://vosges-renovation.github.io/planning/"><button type="button" class="btn second petit" data-maj-page>Enregistrer</button></div></div>';
     h += '<div class="panneau"><h3>Adresse de l\'appli</h3><p class="aide">L\'adresse donnée par Google au moment du déploiement (elle finit par /exec). Elle sert à fabriquer les liens.</p>'
@@ -2302,6 +2338,29 @@
       actionAdmin(api('admin.nouveauCode', { type: c[0], id: c[1] }), 'Nouveau lien créé : envoyez-le à la personne.');
       return;
     }
+    if (b.hasAttribute('data-chv')) {
+      var idv = b.getAttribute('data-chv');
+      var nv = valeur('[data-chv-nom="' + idv + '"]').trim();
+      if (!nv) { toast('Le nom du chantier est vide.'); return; }
+      b.disabled = true;
+      actionAdmin(api('admin.chantierValider', { id: idv, nom: nv, adresse: valeur('[data-chv-adr="' + idv + '"]') }), 'Chantier validé ✓');
+      return;
+    }
+    if (b.hasAttribute('data-chr')) {
+      var idr = b.getAttribute('data-chr'), vers = valeur('[data-chr-vers="' + idr + '"]');
+      if (!vers) { toast('Choisissez le chantier existant dans la liste.'); return; }
+      b.disabled = true;
+      api('admin.chantierRattacher', { id: idr, vers: vers, du: A.d.du, au: A.d.au }).then(function (r) {
+        A.init = r.init; fusionner(A.d, r.d); dessinerAdmin();
+        toast('Rattaché ✓ : ses heures sont passées sur le chantier existant.');
+      }, function (e) { toast(e.message); dessinerAdmin(); });
+      return;
+    }
+    if (b.hasAttribute('data-maj-mail')) {
+      b.disabled = true;
+      actionAdmin(api('admin.mailAlerte', { adresse: valeur('[data-mail-alerte]') }), 'Adresse enregistrée ✓');
+      return;
+    }
     if (b.hasAttribute('data-maj-page')) {
       b.disabled = true;
       actionAdmin(api('admin.adressePage', { adresse: valeur('[data-adresse-page]') }), 'Adresse enregistrée : les liens ont changé, pensez à les renvoyer.');
@@ -2329,7 +2388,7 @@
     b.className = 'etat' + (texte ? ' visible' : '') + (horsLigne ? ' hors' : '');
   }
   // Date de cette version de la page : à changer à chaque modification (même date que VERSION dans Code.gs quand les deux changent)
-  var VERSION_PAGE = '19/10/2026 10h00';
+  var VERSION_PAGE = '19/10/2026 11h00';
   function montrerVersion(google) {
     var v = document.getElementById('version');
     if (v) v.textContent = 'Page du ' + VERSION_PAGE + ' · Google ' + (google === undefined ? '…' : google ? 'du ' + google : 'ancienne version');

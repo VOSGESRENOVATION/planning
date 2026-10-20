@@ -1115,22 +1115,25 @@
     // État de la fenêtre
     var absenceLigne = ceMoment.filter(function (l) { return !l.chantier; })[0];
     var absent = !!absenceLigne, motif = absenceLigne ? absenceLigne.remarque : '';
-    var creneaux = ceMoment.filter(function (l) { return l.chantier && !l.travail; }).map(function (l) { return { chantier: l.chantier, debut: l.debut, fin: l.fin, pause: Number(l.pause) || 0, autre: l.chantier !== chantierPrevu }; });
-    if (!creneaux.length) creneaux = [{ chantier: chantierPrevu, debut: '', fin: '', pause: 0, autre: !chantierPrevu }];
+    var creneaux = ceMoment.filter(function (l) { return l.chantier && !l.travail; }).map(function (l) { return { chantier: l.chantier, debut: l.debut, fin: l.fin, pause: Number(l.pause) || 0, remarque: l.remarque || '', autre: l.chantier !== chantierPrevu }; });
+    if (!creneaux.length) {
+      // Seulement des travaux en attente : un commentaire déjà posé sur l'un d'eux revient dans le premier créneau
+      var commTravail = (ceMoment.filter(function (l) { return l.chantier && l.remarque; })[0] || {}).remarque || '';
+      creneaux = [{ chantier: chantierPrevu, debut: '', fin: '', pause: 0, remarque: commTravail, autre: !chantierPrevu }];
+    }
     var faits = {}; // travail → { debut, fin, termine }
     ceMoment.filter(function (l) { return l.travail; }).forEach(function (l) {
       var t = travailParId(l.travail);
       faits[l.travail] = { debut: l.debut, fin: l.fin, termine: !!(t && t.statut === 'fait') };
     });
     var dejaFaits = Object.keys(faits);
-    var commentaire = (ceMoment.filter(function (l) { return l.chantier && l.remarque; })[0] || {}).remarque || '';
     var deroule = dejaFaits.length > 0;
     var listeTravaux = (S.travaux || []).filter(function (t) { return t.statut !== 'fait' || faits[t.id]; });
 
     var fen = fenetreSimple('', function (b, fermer) {
       lire();
       if (b.hasAttribute('data-annuler')) { fermer(); return; }
-      if (b.hasAttribute('data-ajouter')) { creneaux.push({ chantier: '', debut: '', fin: '', pause: 0, autre: true }); dessiner(); return; }
+      if (b.hasAttribute('data-ajouter')) { creneaux.push({ chantier: '', debut: '', fin: '', pause: 0, remarque: '', autre: true }); dessiner(); return; }
       if (b.hasAttribute('data-retirer')) { creneaux.splice(Number(b.getAttribute('data-retirer')), 1); dessiner(); return; }
       if (b.hasAttribute('data-deroule')) { deroule = !deroule; dessiner(); return; }
       if (b.hasAttribute('data-tfini')) { var x = b.getAttribute('data-tfini').split('|'); faits[x[0]].termine = x[1] === '1'; dessiner(); return; }
@@ -1186,6 +1189,7 @@
           h += '<div class="trio"><label class="champ"><span>Début</span>' + champHeure('data-c="debut"', c.debut) + '</label>'
             + '<label class="champ"><span>Fin</span>' + champHeure('data-c="fin"', c.fin) + '</label>'
             + '<label class="champ"><span>Pause</span><select data-c="pause">' + optionsPause(c.pause) + '</select></label></div>'
+            + '<label class="champ" style="margin-top:8px"><span>Commentaire pour le bureau (facultatif)</span><textarea data-c="remarque" rows="2" maxlength="2000">' + esc(c.remarque || '') + '</textarea></label>'
             + (i > 0 ? '<button type="button" class="lien-btn" data-retirer="' + i + '">Retirer ce créneau</button>' : '')
             + '</div>';
         });
@@ -1208,8 +1212,7 @@
             }).join('') + '</div>';
           }
         }
-        h += '<div class="total-s">Total ' + nomM + ' : <b data-total>' + fh(minutesTotal()) + '</b></div>'
-          + '<label class="champ"><span>Commentaire pour le bureau (facultatif)</span><textarea data-comm rows="3" maxlength="2000">' + esc(commentaire) + '</textarea></label>';
+        h += '<div class="total-s">Total ' + nomM + ' : <b data-total>' + fh(minutesTotal()) + '</b></div>';
       }
       if (message) h += '<div class="erreur-saisie">' + esc(message) + '</div>';
       h += '<div class="pied"><button type="button" class="btn second" data-annuler>Annuler</button><button type="button" class="btn" data-ok>Enregistrer ' + (matin ? 'le matin' : 'l\'après-midi') + '</button></div>';
@@ -1219,12 +1222,11 @@
 
     function lire() {
       var m = f.querySelector('[data-motif]'); if (m) motif = m.value;
-      var cm = f.querySelector('[data-comm]'); if (cm) commentaire = cm.value;
       f.querySelectorAll('.creneau-s').forEach(function (bloc) {
         var c = creneaux[Number(bloc.getAttribute('data-i'))];
         bloc.querySelectorAll('[data-c]').forEach(function (x) {
           var k = x.getAttribute('data-c');
-          c[k] = k === 'pause' ? Number(x.value) : k === 'chantier' ? x.value : (lireHeure(x.value) || x.value.trim());
+          c[k] = k === 'pause' ? Number(x.value) : (k === 'chantier' || k === 'remarque') ? x.value : (lireHeure(x.value) || x.value.trim());
         });
         if (!c.autre && chantierPrevu && Number(bloc.getAttribute('data-i')) === 0) c.chantier = chantierPrevu;
       });
@@ -1239,15 +1241,15 @@
           etats: dejaFaits.reduce(function (o, id) { o[id] = 'a_faire'; return o; }, {}) };
       }
       var heureOk = function (h) { return /^\d\d:\d\d$/.test(h); };
-      var lignes = [];
+      var lignes = [], commSeul = '';
       for (var i = 0; i < creneaux.length; i++) {
         var c = creneaux[i];
         var vide = !c.debut && !c.fin;
-        if (vide && i === 0 && Object.keys(faits).length) continue; // seulement des travaux en attente
+        if (vide && i === 0 && Object.keys(faits).length) { commSeul = (c.remarque || '').trim(); continue; } // seulement des travaux en attente
         if (vide && i === 0) return { erreur: 'Indique tes heures, ou coche un travail en attente fait.' };
         if (!c.chantier) return { erreur: 'Choisis le chantier.' };
         if (!heureOk(c.debut) || (c.fin && !heureOk(c.fin))) return { erreur: 'Heure illisible : tape par exemple 0830 pour 8h30.' };
-        lignes.push({ chantier: c.chantier, debut: c.debut, fin: c.fin, pause: c.pause, remarque: '' });
+        lignes.push({ chantier: c.chantier, debut: c.debut, fin: c.fin, pause: c.pause, remarque: (c.remarque || '').trim() });
       }
       var etats = {};
       var ids = Object.keys(faits);
@@ -1258,7 +1260,7 @@
         etats[ids[j]] = x.termine ? 'fait' : 'a_faire';
       }
       dejaFaits.forEach(function (id) { if (!faits[id]) etats[id] = 'a_faire'; });
-      if (lignes.length && commentaire.trim()) lignes[0].remarque = commentaire.trim();
+      if (lignes.length && commSeul) lignes[0].remarque = commSeul;
       var pb = valider(autres.concat(lignes));
       if (pb) return { erreur: pb };
       return { lignes: lignes, etats: etats };
@@ -2388,7 +2390,7 @@
     b.className = 'etat' + (texte ? ' visible' : '') + (horsLigne ? ' hors' : '');
   }
   // Date de cette version de la page : à changer à chaque modification (même date que VERSION dans Code.gs quand les deux changent)
-  var VERSION_PAGE = '19/10/2026 11h00';
+  var VERSION_PAGE = '20/10/2026';
   function montrerVersion(google) {
     var v = document.getElementById('version');
     if (v) v.textContent = 'Page du ' + VERSION_PAGE + ' · Google ' + (google === undefined ? '…' : google ? 'du ' + google : 'ancienne version');

@@ -1454,6 +1454,15 @@
     var faitesJour = function (dt) { return total(re[S.id + '|' + dt] || []); };
     var lundi = lundiDe(auj);
     var h = '';
+    // Heures sup. : envoyées par le bureau (Roberta), l'appli ne les calcule pas (22/10/2026)
+    var cpt = S.compteur;
+    if (cpt) {
+      var le = String(cpt.le || '');
+      h += '<div class="bloc-h"><div class="bloc-titre">Mes heures sup.</div>'
+        + '<div class="chiffre-h">' + hCourt(cpt.deCote) + ' <small>de côté, à récupérer</small></div>'
+        + '<div class="ligne-h"><span>Payées' + (cpt.moisPayees ? ' sur la paie ' + esc(cpt.moisPayees) : '') + '</span><b>' + (cpt.payees ? hCourt(cpt.payees) : '—') + '</b></div>'
+        + (le ? '<div class="sous-h">Arrêté par le bureau le ' + esc(le.slice(8, 10) + '/' + le.slice(5, 7)) + '</div>' : '') + '</div>';
+    }
     // Cette semaine
     var semaine = 0, prevues = 0, reste = [], lignes = '';
     for (var i = 0; i < 7; i++) {
@@ -2390,7 +2399,7 @@
     b.className = 'etat' + (texte ? ' visible' : '') + (horsLigne ? ' hors' : '');
   }
   // Date de cette version de la page : à changer à chaque modification (même date que VERSION dans Code.gs quand les deux changent)
-  var VERSION_PAGE = '20/10/2026';
+  var VERSION_PAGE = '22/10/2026';
   function montrerVersion(google) {
     var v = document.getElementById('version');
     if (v) v.textContent = 'Page du ' + VERSION_PAGE + ' · Google ' + (google === undefined ? '…' : google ? 'du ' + google : 'ancienne version');

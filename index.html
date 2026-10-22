@@ -344,6 +344,8 @@
   table.compteur .tot { font-weight: 700; background: var(--fond-reel); }
   table.compteur tr:last-child td { border-bottom: 0; }
   .aide-compteur { color: var(--gris); font-size: 13px; margin-top: 10px; }
+.ligne-hs { display: flex; gap: 16px; padding: 6px 0; border-bottom: 1px solid var(--bord); font-size: 14px; }
+.ligne-hs span:first-child { min-width: 140px; font-weight: 600; }
   @media print {
     @page { size: A4 landscape; margin: 8mm; }
     /* Plusieurs semaines en portrait : seule la zone d'impression sort */
@@ -1782,10 +1784,27 @@
       return s.actif || A.d.reel.some(function (x) { return x.salarie === s.id && x.date >= b.du && x.date <= b.au; });
     });
     var court = function (dt) { return d(dt).getUTCDate(); };
+    // Heures sup. : envoyées par Roberta (le bureau), l'appli ne les calcule pas (22/10/2026)
+    var cpts = {};
+    (A.init.compteurs || []).forEach(function (c) { cpts[c.id] = c; });
+    var nomMois = function (m) { return NOMS_MOIS[Number(m.slice(5, 7)) - 1] + ' ' + m.slice(0, 4); };
+    salaries.forEach(function (s) {
+      var c = cpts[s.id];
+      if (!c) return;
+      var lignesH = (c.historique || []).filter(function (m) { return m.envoye && (m.deCote || m.report); }).map(function (m) {
+        var t = [];
+        if (m.deCote) t.push('+' + hCourt(m.deCote) + ' mises de côté' + (m.feuille === 'contrat' ? ' (envoyé avec la feuille du contrat)' : ' (faites après l\'envoi à ACP)'));
+        if (m.report) t.push('−' + hCourt(m.report) + ' payées sur cette paie');
+        return '<div class="ligne-hs"><span>' + maj(nomMois(m.mois)) + '</span><span>' + t.join(' · ') + '</span></div>';
+      }).join('');
+      h += '<div class="panneau"><h3>Heures sup. pas payées — ' + esc(s.nom) + ' : ' + hCourt(c.deCote) + ' de côté</h3>'
+        + (lignesH || '<p class="aide">Aucune heure sup. mise de côté pour l\'instant.</p>')
+        + '<p class="aide">Arrêté par Roberta le ' + esc(String(c.le || '').slice(8, 10) + '/' + String(c.le || '').slice(5, 7)) + '. 1 h de côté = 1 h récupérée.</p></div>';
+    });
     h += '<div class="grille-cadre"><table class="compteur"><thead><tr><th class="col-nom"></th>'
       + semaines.map(function (w) {
         return '<th>Semaine<br><span>' + (w.du === w.au ? court(w.du) : court(w.du) + ' → ' + court(w.au)) + ' ' + MOIS[d(w.au).getUTCMonth()] + '</span></th>';
-      }).join('') + '<th class="tot">Total du mois</th></tr></thead><tbody>';
+      }).join('') + '<th class="tot">Total du mois</th><th>HS payées<br><span>sur la paie du mois</span></th><th>HS mises<br><span>de côté</span></th></tr></thead><tbody>';
     salaries.forEach(function (s) {
       var totMois = 0;
       h += '<tr><td class="nom' + (s.actif ? '' : ' inactif') + '">' + esc(s.nom) + '</td>';
@@ -1795,7 +1814,12 @@
         totMois += t;
         h += '<td>' + (t ? hCourt(t) : '<span class="vide">—</span>') + '</td>';
       });
-      h += '<td class="tot">' + hCourt(totMois) + '</td></tr>';
+      h += '<td class="tot">' + hCourt(totMois) + '</td>';
+      var hm = cpts[s.id] ? (cpts[s.id].historique || []).filter(function (m) { return m.mois === A.mois; })[0] : null;
+      if (hm && hm.envoye) h += '<td>' + (hm.payees + hm.report ? hCourt(hm.payees + hm.report) : '<span class="vide">—</span>') + '</td><td>' + (hm.deCote ? hCourt(hm.deCote) : '<span class="vide">—</span>') + '</td>';
+      else if (hm) h += '<td colspan="2"><span class="vide">pas encore envoyé à ACP</span></td>';
+      else h += '<td><span class="vide">—</span></td><td><span class="vide">—</span></td>';
+      h += '</tr>';
     });
     return h + '</tbody></table></div>'
       + '<p class="aide-compteur">Heures réellement saisies (pauses déduites). Une semaine à cheval sur deux mois ne compte ici que ses jours du mois.</p>';
@@ -2399,7 +2423,7 @@
     b.className = 'etat' + (texte ? ' visible' : '') + (horsLigne ? ' hors' : '');
   }
   // Date de cette version de la page : à changer à chaque modification (même date que VERSION dans Code.gs quand les deux changent)
-  var VERSION_PAGE = '22/10/2026';
+  var VERSION_PAGE = '22/10/2026 18h';
   function montrerVersion(google) {
     var v = document.getElementById('version');
     if (v) v.textContent = 'Page du ' + VERSION_PAGE + ' · Google ' + (google === undefined ? '…' : google ? 'du ' + google : 'ancienne version');

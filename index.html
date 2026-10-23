@@ -1786,7 +1786,11 @@
     var court = function (dt) { return d(dt).getUTCDate(); };
     // Heures sup. : envoyées par Roberta (le bureau), l'appli ne les calcule pas (22/10/2026)
     var cpts = {};
-    (A.init.compteurs || []).forEach(function (c) { cpts[c.id] = c; });
+    // Google renvoie les nombres en texte (« 0 » compterait comme rempli) : on les remet en nombres
+    (A.init.compteurs || []).forEach(function (c) {
+      (c.historique || []).forEach(function (m) { ['hs', 'payees', 'deCote', 'report'].forEach(function (k) { m[k] = Number(m[k]) || 0; }); });
+      cpts[c.id] = c;
+    });
     var nomMois = function (m) { return NOMS_MOIS[Number(m.slice(5, 7)) - 1] + ' ' + m.slice(0, 4); };
     salaries.forEach(function (s) {
       var c = cpts[s.id];
@@ -2423,7 +2427,7 @@
     b.className = 'etat' + (texte ? ' visible' : '') + (horsLigne ? ' hors' : '');
   }
   // Date de cette version de la page : à changer à chaque modification (même date que VERSION dans Code.gs quand les deux changent)
-  var VERSION_PAGE = '22/10/2026 18h';
+  var VERSION_PAGE = '22/10/2026 18h30';
   function montrerVersion(google) {
     var v = document.getElementById('version');
     if (v) v.textContent = 'Page du ' + VERSION_PAGE + ' · Google ' + (google === undefined ? '…' : google ? 'du ' + google : 'ancienne version');
